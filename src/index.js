@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Example from './example/example.jsx';
+import './index.css';
+import Game from './game.jsx';
 
 const App = () => (
-    <div>
-        <Example />       
-    </div>
+    <Game />
 );
 
 ReactDOM.render(<App />, document.getElementById("root"));
