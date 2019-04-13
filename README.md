@@ -1,5 +1,5 @@
 # dominoes-react-game
-Dominoes game implemented with ReactJS and no backend
+Dominoes game for a single player implemented with ReactJS and no backend
 
 ## How to work in development mode
 1. `npm install`
