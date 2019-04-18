@@ -10,16 +10,23 @@ class PlayerDeck extends Component {
     };
   }
 
+  getDominoes() {
+    return (
+      this.props.dominoes.map((domino, i) => (
+        <td key={i}>
+          <Domino direction={Horizontal} dots1={domino[0]} dots2={domino[1]} />
+        </td>
+      ))
+    );
+  }
+
   getInitialDeck() {
     return (
       <div className="player-deck">
         <table>
           <tbody>
             <tr>
-              <td><Domino direction={Horizontal} dots1={5} dots2={2} /></td>
-              <td><Domino direction={Horizontal} dots1={3} dots2={1} /></td>
-              <td><Domino direction={Horizontal} dots1={0} dots2={0} /></td>
-              <td><Domino direction={Horizontal} dots1={6} dots2={4} /></td>
+              {this.getDominoes()}
             </tr>
           </tbody>
         </table>
