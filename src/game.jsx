@@ -26,6 +26,7 @@ class Game extends Component {
       bank: AllDominoes.filter(
         (_, i) => !randomPlayer1DominoesIndexes.includes(i)),
       board: [],
+      playsCount: 0,
     };
   }
 
@@ -45,16 +46,30 @@ class Game extends Component {
   }
 
   onDrop(ev) {
-    let idDropped = parseInt(ev.dataTransfer.getData("id"));
+    if (this.state.bank.length > 0) { // Player already lost
+      let idDropped = parseInt(ev.dataTransfer.getData("id"));
 
-    this.setState({
-      player1Deck: this.state.player1Deck.filter((item) => item != idDropped),
-      board: this.state.board.concat(idDropped),
-      bank: this.state.bank,
-    })
+      this.setState({
+        player1Deck: this.state.player1Deck.filter((item) => item != idDropped),
+        board: this.state.board.concat(idDropped),
+        bank: this.state.bank,
+        playsCount: this.state.playsCount + 1,
+      })
+    }
+  }
+
+  getEndResult() {
+    if (this.state.player1Deck.length === 0) {
+      return "Player wins!";
+    } else {
+      if (this.state.bank.length === 0) {
+        return "Player loses!"
+      }
+    }
   }
 
   render() {
+    let endResult = this.getEndResult();
     return (
       <div>
         <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
@@ -69,6 +84,8 @@ class Game extends Component {
         <div onDragOver={(e) => this.onDragOver(e)}>
           <PlayerDeck dominoes={this.state.player1Deck} />
         </div>
+        <h2>Plays counter: {this.state.playsCount}</h2>
+        <h3>{endResult}</h3>
       </div >
     );
   }
