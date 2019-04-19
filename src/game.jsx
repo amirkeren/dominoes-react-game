@@ -33,7 +33,7 @@ class Game extends Component {
   getRandomPlayer1DominoesIndexes() {
     var randomPlayer1DominoesIndexes = []
     while (randomPlayer1DominoesIndexes.length < PlayerInitialDominoesCount) {
-      var randIndex = Math.floor(Math.random() * AllDominoes.length) + 1;
+      var randIndex = Math.floor(Math.random() * AllDominoes.length);
       if (!randomPlayer1DominoesIndexes.includes(randIndex)) {
         randomPlayer1DominoesIndexes.push(randIndex);
       }
