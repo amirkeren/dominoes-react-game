@@ -10,17 +10,21 @@ class PlayerDeck extends Component {
     };
   }
 
+  onDragStart(ev, id) {
+    ev.dataTransfer.setData("id", id);
+  }
+
   getDominoes() {
     return (
-      this.props.dominoes.map((domino, i) => (
-        <td key={i}>
-          <Domino direction={Horizontal} dots1={domino[0]} dots2={domino[1]} />
+      this.props.dominoes.map((domino) => (
+        <td key={domino} onDragStart={(e) => this.onDragStart(e, domino)} draggable>
+          <Domino direction={Horizontal} dots={domino} />
         </td>
       ))
     );
   }
 
-  getInitialDeck() {
+  getDeck() {
     return (
       <div className="player-deck">
         <table>
@@ -35,7 +39,7 @@ class PlayerDeck extends Component {
   }
 
   render() {
-    return (this.getInitialDeck());
+    return (this.getDeck());
   }
 }
 

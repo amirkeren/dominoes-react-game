@@ -7,36 +7,69 @@ import ImageHeadline from "./dominoes-header.jpg"
 
 const PlayerInitialDominoesCount = 6;
 const AllDominoes = [
-  [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6],
-  [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6],
-  [2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
-  [3, 3], [3, 4], [3, 5], [3, 6],
-  [4, 4], [4, 5], [4, 6],
-  [5, 5], [5, 6],
-  [6, 6]
-];
+  0, 1, 2, 3, 4, 5, 6,
+  11, 12, 13, 14, 15, 16,
+  22, 23, 24, 25, 26,
+  33, 34, 35, 36,
+  44, 45, 46,
+  55, 56,
+  66,
+]
 
 class Game extends Component {
   constructor(props) {
     super(props);
-    let randomPlayer1Dominoes = Array.from(
-      { length: PlayerInitialDominoesCount },
-      (v, i) => Math.floor(Math.random() * AllDominoes.length)
-    );
+    let randomPlayer1DominoesIndexes = this.getRandomPlayer1DominoesIndexes();
     this.state = {
-      player1Deck: AllDominoes.filter((item, i) => randomPlayer1Dominoes.includes(i)),
-      bank: AllDominoes.filter((item, i) => !randomPlayer1Dominoes.includes(i)),
+      player1Deck: AllDominoes.filter(
+        (_, i) => randomPlayer1DominoesIndexes.includes(i)),
+      bank: AllDominoes.filter(
+        (_, i) => !randomPlayer1DominoesIndexes.includes(i)),
+      board: [],
     };
+  }
+
+  getRandomPlayer1DominoesIndexes() {
+    var randomPlayer1DominoesIndexes = []
+    while (randomPlayer1DominoesIndexes.length < PlayerInitialDominoesCount) {
+      var randIndex = Math.floor(Math.random() * AllDominoes.length) + 1;
+      if (!randomPlayer1DominoesIndexes.includes(randIndex)) {
+        randomPlayer1DominoesIndexes.push(randIndex);
+      }
+    }
+    return randomPlayer1DominoesIndexes;
+  }
+
+  onDragOver(ev) {
+    return (ev.preventDefault());
+  }
+
+  onDrop(ev) {
+    let idDropped = parseInt(ev.dataTransfer.getData("id"));
+
+    this.setState({
+      player1Deck: this.state.player1Deck.filter((item) => item != idDropped),
+      board: this.state.board.concat(idDropped),
+      bank: this.state.bank,
+    })
   }
 
   render() {
     return (
       <div>
         <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
-        <h2>board:</h2><Board />
+        <h2>board:</h2>
+        <div
+          onDragOver={(e) => this.onDragOver(e)}
+          onDrop={(e) => this.onDrop(e)}
+        >
+          <Board dominoes={this.state.board} />
+        </div>
         <h2>Player deck:</h2>
-        <PlayerDeck dominoes={this.state.player1Deck} />
-      </div>
+        <div onDragOver={(e) => this.onDragOver(e)}>
+          <PlayerDeck dominoes={this.state.player1Deck} />
+        </div>
+      </div >
     );
   }
 }
