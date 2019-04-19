@@ -22,12 +22,14 @@ class Domino extends Component {
 
   render() {
     let [dir1, dir2] = this.getDirections();
+    let dots1 = Math.floor(this.props.dots / 10);
+    let dots2 = Math.floor(this.props.dots % 10);
     return (
       <table className="domino">
         <tbody>
           <tr>
-            <td><HalfDomino direction={dir1} value={this.props.dots1} /></td>
-            <td><HalfDomino direction={dir2} value={this.props.dots2} /></td>
+            <td><HalfDomino direction={dir1} value={dots1} /></td>
+            <td><HalfDomino direction={dir2} value={dots2} /></td>
           </tr>
         </tbody>
       </table>
@@ -37,8 +39,7 @@ class Domino extends Component {
 
 Domino.propTypes = {
   direction: PropTypes.oneOf([Horizontal, Vertical]).isRequired,
-  dots1: PropTypes.number.isRequired,
-  dots2: PropTypes.number.isRequired,
+  dots: PropTypes.number.isRequired,
 }
 
 export { Domino, Horizontal, Vertical };
