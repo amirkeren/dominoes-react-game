@@ -69,3 +69,5 @@ typings/
 
 # build directory
 public/
+
+package-lock.json
