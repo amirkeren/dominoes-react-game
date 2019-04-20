@@ -58,6 +58,10 @@ class Game extends Component {
     }
   }
 
+  onReset() {
+    return location.reload();
+  }
+
   getEndResult() {
     if (this.state.player1Deck.length === 0) {
       return "Player wins!";
@@ -73,6 +77,9 @@ class Game extends Component {
     return (
       <div>
         <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
+          <button onClick={() => this.onReset()}>
+              Reset
+          </button>
         <h2>board:</h2>
         <div
           onDragOver={(e) => this.onDragOver(e)}
