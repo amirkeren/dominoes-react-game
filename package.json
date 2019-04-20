@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --mode development",
     "build-watch": "webpack --watch --mode development",
-    "start": "webpack-dev-server --mode development --open"
+    "start": "react-scripts start"
   },
   "author": "Regev Golan and Amir Keren",
   "license": "MIT",
