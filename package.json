@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack --mode development",
     "build-watch": "webpack --watch --mode development",
-    "start": "react-scripts start"
+    "start": "node server.js",
+    "heroku-postbuild": "webpack -p"
   },
   "author": "Regev Golan and Amir Keren",
   "license": "MIT",
