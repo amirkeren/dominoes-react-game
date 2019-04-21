@@ -72,14 +72,24 @@ class Game extends Component {
     }
   }
 
+  getBankDomino() {
+    var randBankIndex = Math.floor(Math.random() * this.state.bank.length);
+    this.setState({
+      player1Deck: this.state.player1Deck.concat(this.state.bank[randBankIndex]),
+      bank: this.state.bank.filter((_, i) => i !== randBankIndex),
+      board: this.state.board,
+      playsCount: this.state.playsCount,
+    });
+  }
+
   render() {
     let endResult = this.getEndResult();
     return (
       <div>
         <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
-          <button onClick={() => this.onReset()}>
-              Reset
-          </button>
+        <button onClick={() => this.onReset()}>
+          Reset
+        </button>
         <h2>board:</h2>
         <div
           onDragOver={(e) => this.onDragOver(e)}
@@ -91,6 +101,9 @@ class Game extends Component {
         <div onDragOver={(e) => this.onDragOver(e)}>
           <PlayerDeck dominoes={this.state.player1Deck} />
         </div>
+        <button onClick={() => this.getBankDomino()}>
+          Get domino from the bank
+        </button>
         <h2>Plays counter: {this.state.playsCount}</h2>
         <h3>{endResult}</h3>
       </div >
