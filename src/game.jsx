@@ -102,7 +102,7 @@ class Game extends Component {
         <div onDragOver={(e) => this.onDragOver(e)}>
           <PlayerDeck dominoes={this.state.player1Deck} />
         </div>
-        <button class={bankbtn_class} onClick={() => this.getBankDomino()}>
+        <button className={bankbtn_class} onClick={() => this.getBankDomino()}>
           Get domino from the bank
         </button>
         <h2>Plays counter: {this.state.playsCount}</h2>
