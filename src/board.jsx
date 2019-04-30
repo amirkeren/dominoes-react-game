@@ -13,9 +13,7 @@ class Board extends Component {
   getDominoes() {
     return (
       this.props.dominoes.map((domino) => (
-        <td key={domino}>
           <Domino direction={Horizontal} dots={domino} />
-        </td>
       ))
     );
   }
@@ -23,13 +21,7 @@ class Board extends Component {
   getBoard() {
     return (
       <div className="board">
-        <table>
-          <tbody>
-            <tr>
-              {this.getDominoes()}
-            </tr>
-          </tbody>
-        </table>
+        {this.getDominoes()}
       </div>
     );
   }

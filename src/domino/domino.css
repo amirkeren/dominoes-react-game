@@ -3,6 +3,10 @@
   border: 1px solid black;
 }
 
+.vertical {
+  transform: rotate(90deg);
+}
+
 .dotted {
   background-color: black;
   border-radius: 50%;

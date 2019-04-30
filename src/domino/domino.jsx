@@ -25,14 +25,16 @@ class Domino extends Component {
     let dots1 = Math.floor(this.props.dots / 10);
     let dots2 = Math.floor(this.props.dots % 10);
     return (
-      <table className="domino">
-        <tbody>
-          <tr>
-            <td><HalfDomino direction={dir1} value={dots1} /></td>
-            <td><HalfDomino direction={dir2} value={dots2} /></td>
-          </tr>
-        </tbody>
-      </table>
+        <div className="item">
+          <table className="domino vertical">
+            <tbody>
+              <tr>
+                <td><HalfDomino direction={dir1} value={dots1} /></td>
+                <td><HalfDomino direction={dir2} value={dots2} /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
     );
   }
 }

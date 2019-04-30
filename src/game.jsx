@@ -46,7 +46,7 @@ class Game extends Component {
   }
 
   onDrop(ev) {
-    if (this.state.bank.length > 0) { // Player already lost
+    if (this.state.bank.length > 0) {
       let idDropped = parseInt(ev.dataTransfer.getData("id"));
 
       this.setState({
