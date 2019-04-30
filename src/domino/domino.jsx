@@ -11,25 +11,28 @@ class Domino extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      direction: Left
+      direction: Left,
+      used: false
     };
     this.onClick = this.onClick.bind(this);
   }
 
   onClick() {
-    switch(this.state.direction) {
-      case Left:
-        this.setState({ direction: Down });
-        break;
-      case Down:
-        this.setState({ direction: Right });
-        break;
-      case Right:
-        this.setState({ direction: Up });
-        break;
-      case Up:
-        this.setState({ direction: Left });
-        break;
+    if (!this.state.used) {
+      switch (this.state.direction) {
+        case Left:
+          this.setState({direction: Down});
+          break;
+        case Down:
+          this.setState({direction: Right});
+          break;
+        case Right:
+          this.setState({direction: Up});
+          break;
+        case Up:
+          this.setState({direction: Left});
+          break;
+      }
     }
   }
 
@@ -43,8 +46,9 @@ class Domino extends Component {
     let [dir1, dir2] = this.getDirections();
     let dots1 = Math.floor(this.props.dots / 10);
     let dots2 = Math.floor(this.props.dots % 10);
+    const classes = `item ${this.state.direction}`;
     return (
-        <div className={this.state.direction}  onClick={this.onClick}>
+        <div className={classes} onClick={this.onClick}>
           <table className="domino">
             <tbody>
               <tr>

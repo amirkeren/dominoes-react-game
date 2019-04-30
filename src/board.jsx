@@ -13,7 +13,7 @@ class Board extends Component {
   getDominoes() {
     return (
       this.props.dominoes.map((domino) => (
-          <Domino direction={Horizontal} dots={domino} />
+          <Domino key={domino} direction={Horizontal} dots={domino} />
       ))
     );
   }
