@@ -11,7 +11,26 @@ class Domino extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      direction: Left
     };
+    this.onClick = this.onClick.bind(this);
+  }
+
+  onClick() {
+    switch(this.state.direction) {
+      case Left:
+        this.setState({ direction: Down });
+        break;
+      case Down:
+        this.setState({ direction: Right });
+        break;
+      case Right:
+        this.setState({ direction: Up });
+        break;
+      case Up:
+        this.setState({ direction: Left });
+        break;
+    }
   }
 
   getDirections() {
@@ -25,8 +44,8 @@ class Domino extends Component {
     let dots1 = Math.floor(this.props.dots / 10);
     let dots2 = Math.floor(this.props.dots % 10);
     return (
-        <div className="item">
-          <table className="domino vertical">
+        <div className={this.state.direction}  onClick={this.onClick}>
+          <table className="domino">
             <tbody>
               <tr>
                 <td><HalfDomino direction={dir1} value={dots1} /></td>

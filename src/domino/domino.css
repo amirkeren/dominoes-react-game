@@ -3,8 +3,16 @@
   border: 1px solid black;
 }
 
-.vertical {
+.Up {
   transform: rotate(90deg);
+}
+
+.Right {
+  transform: rotate(180deg);
+}
+
+.Down {
+  transform: rotate(270deg);
 }
 
 .dotted {
