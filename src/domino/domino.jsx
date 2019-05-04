@@ -8,38 +8,37 @@ class Domino extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      direction: this.props.direction,
+      domino: this.props.domino
     };
     this.onClick = this.onClick.bind(this);
   }
 
   onClick() {
     if (!this.props.used) {
-      switch (this.state.direction) {
+      let dominoCopy = JSON.parse(JSON.stringify(this.state.domino));
+      switch (dominoCopy.direction) {
         case Left:
-          this.props.sendData({'domino': this.props.dots, 'direction': Up});
-          this.setState({direction: Up});
+          dominoCopy.direction = Up;
           break;
         case Up:
-          this.props.sendData({'domino': this.props.dots, 'direction': Right});
-          this.setState({direction: Right});
+          dominoCopy.direction = Right;
           break;
         case Right:
-          this.props.sendData({'domino': this.props.dots, 'direction': Down});
-          this.setState({direction: Down});
+          dominoCopy.direction = Down;
           break;
         case Down:
-          this.props.sendData({'domino': this.props.dots, 'direction': Left});
-          this.setState({direction: Left});
+          dominoCopy.direction = Left;
           break;
       }
+      this.props.sendData(dominoCopy);
+      this.setState({domino: dominoCopy});
     }
   }
 
   render() {
-    let dots1 = Math.floor(this.props.dots / 10);
-    let dots2 = Math.floor(this.props.dots % 10);
-    const classes = `item ${this.state.direction}`;
+    let dots1 = Math.floor(this.props.domino.dot / 10);
+    let dots2 = Math.floor(this.props.domino.dot % 10);
+    const classes = `item ${this.state.domino.direction}`;
     return (
         <div className={classes} onClick={this.onClick}>
           <table className="domino">
@@ -56,9 +55,8 @@ class Domino extends Component {
 }
 
 Domino.propTypes = {
-  direction: PropTypes.oneOf([Left, Right, Up, Down]).isRequired,
-  used: PropTypes.bool,
-  dots: PropTypes.number.isRequired,
+  //placement will render used redundant
+  used: PropTypes.bool
 };
 
 export { Domino };

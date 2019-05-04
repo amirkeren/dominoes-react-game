@@ -9,13 +9,13 @@ import { Left } from "./domino/halfDomino.jsx";
 const PlayerInitialDominoesCount = 6;
 
 let AllDominoes = {
-    0:  { direction: Left }, 1:  { direction: Left }, 2:  { direction: Left }, 3:  { direction: Left }, 4:  { direction: Left }, 5:  { direction: Left }, 6:  { direction: Left },
-    11: { direction: Left }, 12: { direction: Left }, 13: { direction: Left }, 14: { direction: Left }, 15: { direction: Left }, 16: { direction: Left },
-    22: { direction: Left }, 23: { direction: Left }, 24: { direction: Left }, 25: { direction: Left }, 26: { direction: Left },
-    33: { direction: Left }, 34: { direction: Left }, 35: { direction: Left }, 36: { direction: Left },
-    44: { direction: Left }, 45: { direction: Left }, 46: { direction: Left },
-    55: { direction: Left }, 56: { direction: Left },
-    66: { direction: Left }
+    0:  { dot: 0,  direction: Left }, 1:  { dot: 1,  direction: Left }, 2:  { dot: 2,  direction: Left }, 3:  { dot: 3,  direction: Left }, 4:  { dot: 4,  direction: Left }, 5:  { dot: 5,  direction: Left }, 6:  { dot: 6,  direction: Left },
+    11: { dot: 11, direction: Left }, 12: { dot: 12, direction: Left }, 13: { dot: 13, direction: Left }, 14: { dot: 14, direction: Left }, 15: { dot: 15, direction: Left }, 16: { dot: 16 , direction: Left },
+    22: { dot: 22, direction: Left }, 23: { dot: 23, direction: Left }, 24: { dot: 24, direction: Left }, 25: { dot: 25, direction: Left }, 26: { dot: 26, direction: Left },
+    33: { dot: 33, direction: Left }, 34: { dot: 34, direction: Left }, 35: { dot: 35, direction: Left }, 36: { dot: 36, direction: Left },
+    44: { dot: 44, direction: Left }, 45: { dot: 45, direction: Left }, 46: { dot: 46, direction: Left },
+    55: { dot: 55, direction: Left }, 56: { dot: 56, direction: Left },
+    66: { dot: 66, direction: Left }
 };
 
 class Game extends Component {
@@ -32,7 +32,7 @@ class Game extends Component {
     }
 
     getData(val) {
-        this.state.player1Deck[val.domino].direction = val.direction;
+        this.state.player1Deck[val.dot].direction = val.direction;
     }
 
     static getRandomPlayer1Dominoes() {

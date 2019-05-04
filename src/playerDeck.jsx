@@ -23,7 +23,7 @@ class PlayerDeck extends Component {
     return (
       Object.keys(this.props.dominoes).map((domino) => (
         <td key={domino} onDragStart={(e) => PlayerDeck.onDragStart(e, domino)} draggable>
-          <Domino sendData={this.getData} direction={this.props.dominoes[domino].direction} dots={parseInt(domino)}/>
+          <Domino sendData={this.getData} domino={this.props.dominoes[domino]}/>
         </td>
       ))
     );
