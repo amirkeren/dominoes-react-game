@@ -61,7 +61,7 @@ class Game extends Component {
             boardCopy[idDropped] = AllDominoes[idDropped];
             boardCopy[idDropped].placement = placement;
             this.setState({
-                player1Deck: Object.fromEntries(Object.entries(this.state.player1Deck).filter(([k, ]) => { return k !== idDropped })),
+                player1Deck: Object.fromEntries(Object.entries(this.state.player1Deck).filter(([k, ]) => { return k !== idDropped.toString() })),
                 board: boardCopy,
                 bank: this.state.bank,
                 playsCount: this.state.playsCount + 1,

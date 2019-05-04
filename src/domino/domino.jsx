@@ -45,7 +45,7 @@ class Domino extends Component {
       gridColumnEnd: this.props.domino.placement ? this.props.domino.placement.x : 0,
       gridRowStart: this.props.domino.placement ? this.props.domino.placement.y : 0,
       gridRowEnd: this.props.domino.placement ? this.props.domino.placement.y : 0,
-  };
+    };
     return (
         <div style={divStyle} onClick={this.onClick}>
           <table className="domino">
