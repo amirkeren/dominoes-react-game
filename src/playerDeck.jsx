@@ -2,13 +2,11 @@ import React, { Component } from "react";
 
 import './playerDeck.css';
 import { Domino } from "./domino/domino.jsx"
-import { Left } from "./domino/halfDomino.jsx";
 
 class PlayerDeck extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // directions: {}
     };
     this.getData = this.getData.bind(this);
   }
@@ -23,9 +21,9 @@ class PlayerDeck extends Component {
 
   getDominoes() {
     return (
-      this.props.dominoes.map((domino) => (
+      Object.keys(this.props.dominoes).map((domino) => (
         <td key={domino} onDragStart={(e) => PlayerDeck.onDragStart(e, domino)} draggable>
-          <Domino sendData={this.getData} direction={Left} dots={domino}/>
+          <Domino sendData={this.getData} direction={this.props.dominoes[domino].direction} dots={parseInt(domino)}/>
         </td>
       ))
     );

@@ -2,7 +2,6 @@ import React, { Component } from "react";
 
 import "./board.css";
 import { Domino } from "./domino/domino.jsx"
-import { Left } from "./domino/halfDomino.jsx";
 
 class Board extends Component {
   constructor(props) {
@@ -13,8 +12,8 @@ class Board extends Component {
 
   getDominoes() {
     return (
-      this.props.dominoes.map((domino) => (
-          <Domino key={domino} direction={this.props.directions[domino] ? this.props.directions[domino] : Left} dots={domino} used={true}/>
+      Object.keys(this.props.dominoes).map((domino) => (
+          <Domino key={domino} direction={this.props.dominoes[domino].direction} dots={parseInt(domino)} used={true}/>
       ))
     );
   }
