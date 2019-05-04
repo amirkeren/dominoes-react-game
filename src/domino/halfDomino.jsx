@@ -4,10 +4,10 @@ import PropTypes from "prop-types";
 import "./domino.css";
 import DotCell from "./dotCell.jsx";
 
-const Up = "Up";
-const Down = "Down";
-const Right = "Right";
-const Left = "Left";
+export const Up = "Up";
+export const Down = "Down";
+export const Right = "Right";
+export const Left = "Left";
 const valueToDottedCells = {
   0: [],
   1: [4],
@@ -16,7 +16,7 @@ const valueToDottedCells = {
   4: [0, 2, 6, 8],
   5: [0, 2, 4, 6, 8],
   6: [0, 2, 3, 5, 6, 8],
-}
+};
 
 class HalfDomino extends Component {
   constructor(props) {
@@ -59,8 +59,7 @@ class HalfDomino extends Component {
 }
 
 HalfDomino.propTypes = {
-  direction: PropTypes.oneOf([Up, Down, Left, Right]).isRequired,
   value: PropTypes.number.isRequired,
-}
+};
 
-export { HalfDomino, Up, Down, Left, Right };
+export { HalfDomino };
