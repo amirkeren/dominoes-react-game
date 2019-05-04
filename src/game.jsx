@@ -52,11 +52,14 @@ class Game extends Component {
     }
 
     onDrop(ev) {
+        ev.preventDefault();
+        const placement = { 'x': ev.target.id.split(',')[1], 'y': ev.target.id.split(',')[0] };
+        //TODO - check this if line
         if (Object.keys(this.state.bank).length > 0) {
-            let idDropped = parseInt(ev.dataTransfer.getData("id"));
+            const idDropped = parseInt(ev.dataTransfer.getData("id"));
             let boardCopy = JSON.parse(JSON.stringify(this.state.board));
             boardCopy[idDropped] = AllDominoes[idDropped];
-            boardCopy[idDropped].placement = { 'x': 2, 'y': 2 };
+            boardCopy[idDropped].placement = placement;
             this.setState({
                 player1Deck: Object.fromEntries(Object.entries(this.state.player1Deck).filter(([k, ]) => { return k !== idDropped })),
                 board: boardCopy,
@@ -82,7 +85,7 @@ class Game extends Component {
 
     getBankDomino() {
         const keys = Object.keys(this.state.bank);
-        var randBankDomino = keys[Math.floor(Math.random() * keys.length)];
+        const randBankDomino = keys[Math.floor(Math.random() * keys.length)];
         let player1DeckCopy = JSON.parse(JSON.stringify(this.state.player1Deck));
         player1DeckCopy[randBankDomino] = AllDominoes[randBankDomino];
         this.setState({
@@ -94,8 +97,8 @@ class Game extends Component {
     }
 
     render() {
-        let endResult = this.getEndResult();
-        let bankbtn_class = Object.keys(this.state.bank).length > 0 ? '' : 'bankbtn_hidden';
+        const endResult = this.getEndResult();
+        const bankbtn_class = Object.keys(this.state.bank).length > 0 ? '' : 'bankbtn_hidden';
         return (
             <div>
                 <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>

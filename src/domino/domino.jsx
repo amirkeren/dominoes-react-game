@@ -35,16 +35,24 @@ class Domino extends Component {
   }
 
   render() {
-    let dots1 = Math.floor(this.props.domino.dot / 10);
-    let dots2 = Math.floor(this.props.domino.dot % 10);
-    const classes = `item ${this.state.domino.direction}`;
+    const dots1 = Math.floor(this.props.domino.dot / 10);
+    const dots2 = Math.floor(this.props.domino.dot % 10);
+    const deg = this.state.domino.direction;
+    const divStyle = {
+      border: '2px solid #000000',
+      transform: 'rotate(' + deg + 'deg)',
+      gridColumnStart: this.props.domino.placement ? this.props.domino.placement.x : 0,
+      gridColumnEnd: this.props.domino.placement ? this.props.domino.placement.x : 0,
+      gridRowStart: this.props.domino.placement ? this.props.domino.placement.y : 0,
+      gridRowEnd: this.props.domino.placement ? this.props.domino.placement.y : 0,
+  };
     return (
-        <div className={classes} onClick={this.onClick}>
+        <div style={divStyle} onClick={this.onClick}>
           <table className="domino">
             <tbody>
               <tr>
-                <td><HalfDomino value={dots1} /></td>
-                <td><HalfDomino value={dots2} /></td>
+                <td><HalfDomino value={dots1}/></td>
+                <td><HalfDomino value={dots2}/></td>
               </tr>
             </tbody>
           </table>

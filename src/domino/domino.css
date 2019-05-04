@@ -1,18 +1,7 @@
 .domino {
   background-color: white;
+  border-radius: 5px;
   border: 1px solid black;
-}
-
-.Up {
-  transform: rotate(90deg);
-}
-
-.Right {
-  transform: rotate(180deg);
-}
-
-.Down {
-  transform: rotate(270deg);
 }
 
 .dotted {

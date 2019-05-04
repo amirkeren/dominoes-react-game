@@ -4,10 +4,11 @@ import PropTypes from "prop-types";
 import "./domino.css";
 import DotCell from "./dotCell.jsx";
 
-export const Up = "Up";
-export const Down = "Down";
-export const Right = "Right";
-export const Left = "Left";
+export const Left = 0;
+export const Up = 90;
+export const Right = 180;
+export const Down = 270;
+
 const valueToDottedCells = {
   0: [],
   1: [4],
@@ -25,7 +26,7 @@ class HalfDomino extends Component {
     };
   }
 
-  isCellDotted(index, value) {
+  static isCellDotted(index, value) {
     return (valueToDottedCells[value].includes(index));
   }
 
@@ -34,19 +35,19 @@ class HalfDomino extends Component {
       <table className="domino">
         <tbody>
           <tr>
-            <DotCell isDotted={this.isCellDotted(0, this.props.value)} />
-            <DotCell isDotted={this.isCellDotted(1, this.props.value)} />
-            <DotCell isDotted={this.isCellDotted(2, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(0, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(1, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(2, this.props.value)} />
           </tr>
           <tr>
-            <DotCell isDotted={this.isCellDotted(3, this.props.value)} />
-            <DotCell isDotted={this.isCellDotted(4, this.props.value)} />
-            <DotCell isDotted={this.isCellDotted(5, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(3, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(4, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(5, this.props.value)} />
           </tr>
           <tr>
-            <DotCell isDotted={this.isCellDotted(6, this.props.value)} />
-            <DotCell isDotted={this.isCellDotted(7, this.props.value)} />
-            <DotCell isDotted={this.isCellDotted(8, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(6, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(7, this.props.value)} />
+            <DotCell isDotted={HalfDomino.isCellDotted(8, this.props.value)} />
           </tr>
         </tbody>
       </table>
