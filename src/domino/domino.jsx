@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 
 import "./domino.css";
 import { HalfDomino, Up, Down, Left, Right } from "./halfDomino.jsx";
@@ -14,7 +13,7 @@ class Domino extends Component {
   }
 
   onClick() {
-    if (!this.props.used) {
+    if (!this.state.domino.placement) {
       let dominoCopy = JSON.parse(JSON.stringify(this.state.domino));
       switch (dominoCopy.direction) {
         case Left:
@@ -53,10 +52,5 @@ class Domino extends Component {
     );
   }
 }
-
-Domino.propTypes = {
-  //placement will render used redundant
-  used: PropTypes.bool
-};
 
 export { Domino };

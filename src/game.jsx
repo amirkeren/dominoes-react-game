@@ -56,6 +56,7 @@ class Game extends Component {
             let idDropped = parseInt(ev.dataTransfer.getData("id"));
             let boardCopy = JSON.parse(JSON.stringify(this.state.board));
             boardCopy[idDropped] = AllDominoes[idDropped];
+            boardCopy[idDropped].placement = { 'x': 2, 'y': 2 };
             this.setState({
                 player1Deck: Object.fromEntries(Object.entries(this.state.player1Deck).filter(([k, ]) => { return k !== idDropped })),
                 board: boardCopy,
