@@ -66,10 +66,10 @@ class Game extends Component {
             } else if (domino.direction === Down) {
                 dot = domino.dot % 10;
             }
-            if (neighborUp.direction === Up && neighborUp.dot % 10 !== dot) {
+            if (neighborUp.direction === Up && dot !== 0 && neighborDown.dot % 10 !== 0 && neighborUp.dot % 10 !== dot) {
                 return false;
             }
-            if (neighborUp.direction === Down && Math.floor(neighborUp.dot / 10) !== dot) {
+            if (neighborUp.direction === Down && dot !== 0 && Math.floor(neighborUp.dot / 10) !== 0 && Math.floor(neighborUp.dot / 10) !== dot) {
                 return false;
             }
         }
@@ -80,10 +80,10 @@ class Game extends Component {
             } else if (domino.direction === Down) {
                 dot = Math.floor(domino.dot / 10);
             }
-            if (neighborDown.direction === Up && Math.floor(neighborDown.dot / 10) !== dot) {
+            if (neighborDown.direction === Up && dot !== 0 && Math.floor(neighborLeft.dot / 10) !== 0 && Math.floor(neighborDown.dot / 10) !== dot) {
                 return false;
             }
-            if (neighborDown.direction === Down && neighborDown.dot % 10 !== dot) {
+            if (neighborDown.direction === Down && dot !== 0 && neighborDown.dot % 10 !== 0 && neighborDown.dot % 10 !== dot) {
                 return false;
             }
         }
@@ -94,10 +94,10 @@ class Game extends Component {
             } else if (domino.direction === Right) {
                 dot = domino.dot % 10;
             }
-            if (neighborLeft.direction === Left && neighborLeft.dot % 10 !== dot) {
+            if (neighborLeft.direction === Left && dot !== 0 && neighborRight.dot % 10 !== 0 && neighborLeft.dot % 10 !== dot) {
                 return false;
             }
-            if (neighborLeft.direction === Right && Math.floor(neighborLeft.dot / 10) !== dot) {
+            if (neighborLeft.direction === Right && dot !== 0 && Math.floor(neighborLeft.dot / 10) !== 0 && Math.floor(neighborLeft.dot / 10) !== dot) {
                 return false;
             }
         }
@@ -108,10 +108,11 @@ class Game extends Component {
             } else if (domino.direction === Right) {
                 dot = Math.floor(domino.dot / 10);
             }
-            if (neighborRight.direction === Left && Math.floor(neighborRight.dot / 10) !== dot) {
+
+            if (neighborRight.direction === Left && dot !== 0 && Math.floor(neighborRight.dot / 10) !== 0 && Math.floor(neighborRight.dot / 10) !== dot) {
                 return false;
             }
-            if (neighborRight.direction === Right && neighborRight.dot % 10 !== dot) {
+            if (neighborRight.direction === Right && dot !== 0 && neighborRight.dot % 10 !== 0 && neighborRight.dot % 10 !== dot) {
                 return false;
             }
         }
