@@ -1,11 +1,15 @@
 .board {
   background-color: #b7bebe;
   border: 2px solid #f76707;
-  margin:0 auto;
-  width: 50%;
   border-radius: 5px;
   display: grid;
   justify-content: center;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  /*grid-template-columns: repeat(3, 1fr);*/
+  /*grid-template-rows: repeat(3, 1fr);*/
+  grid-template-columns: 100px 100px 100px;
+  grid-template-rows: 100px 100px 100px;
+}
+
+.placeholder {
+  border: 1px dashed black;
 }

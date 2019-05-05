@@ -39,7 +39,7 @@ class Domino extends Component {
     const dots2 = Math.floor(this.props.domino.dot % 10);
     const deg = this.state.domino.direction;
     const divStyle = {
-      border: '2px solid #000000',
+      border: '1px solid black',
       transform: 'rotate(' + deg + 'deg)',
       gridColumnStart: this.props.domino.placement ? this.props.domino.placement.x : 0,
       gridColumnEnd: this.props.domino.placement ? this.props.domino.placement.x : 0,

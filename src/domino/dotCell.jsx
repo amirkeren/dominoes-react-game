@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 
 import "./domino.css";
 
@@ -21,12 +20,8 @@ class DotCell extends Component {
   }
 }
 
-DotCell.propTypes = {
-  isDotted: PropTypes.bool,
-}
-
 DotCell.defaultProps = {
   isDotted: true,
-}
+};
 
 export default DotCell;

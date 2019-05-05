@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 
 import "./domino.css";
 import DotCell from "./dotCell.jsx";
@@ -58,9 +57,5 @@ class HalfDomino extends Component {
     return (this.getTable());
   }
 }
-
-HalfDomino.propTypes = {
-  value: PropTypes.number.isRequired,
-};
 
 export { HalfDomino };

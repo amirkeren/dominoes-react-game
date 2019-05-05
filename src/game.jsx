@@ -4,7 +4,7 @@ import "./game.css";
 import Board from "./board.jsx";
 import PlayerDeck from "./playerDeck.jsx";
 import ImageHeadline from "./dominoes-header.jpg"
-import { Left } from "./domino/halfDomino.jsx";
+import { Left, Right, Up, Down } from "./domino/halfDomino.jsx";
 
 const PlayerInitialDominoesCount = 6;
 
@@ -51,12 +51,92 @@ class Game extends Component {
         return (ev.preventDefault());
     }
 
+    static isValidPlacement(domino, placement) {
+        const x = parseInt(placement.x);
+        const y = parseInt(placement.y);
+        const neighborUp = Game.getDominoByPlacement({ x: x.toString(), y: (y - 1).toString() });
+        const neighborDown = Game.getDominoByPlacement({ x: x.toString(), y: (y + 1).toString() });
+        const neighborLeft = Game.getDominoByPlacement({ x: (x - 1).toString(), y: y.toString() });
+        const neighborRight = Game.getDominoByPlacement({ x: (x + 1).toString(), y: y.toString() });
+        //TODO - handle 0 value, wildcards, horizontal with vertical placement etc.
+        if (neighborUp) {
+            let dot;
+            if (domino.direction === Up) {
+                dot = Math.floor(domino.dot / 10);
+            } else if (domino.direction === Down) {
+                dot = domino.dot % 10;
+            }
+            if (neighborUp.direction === Up && neighborUp.dot % 10 !== dot) {
+                return false;
+            }
+            if (neighborUp.direction === Down && Math.floor(neighborUp.dot / 10) !== dot) {
+                return false;
+            }
+        }
+        if (neighborDown) {
+            let dot;
+            if (domino.direction === Up) {
+                dot = domino.dot % 10;
+            } else if (domino.direction === Down) {
+                dot = Math.floor(domino.dot / 10);
+            }
+            if (neighborDown.direction === Up && Math.floor(neighborDown.dot / 10) !== dot) {
+                return false;
+            }
+            if (neighborDown.direction === Down && neighborDown.dot % 10 !== dot) {
+                return false;
+            }
+        }
+        if (neighborLeft) {
+            let dot;
+            if (domino.direction === Left) {
+                dot = Math.floor(domino.dot / 10);
+            } else if (domino.direction === Right) {
+                dot = domino.dot % 10;
+            }
+            if (neighborLeft.direction === Left && neighborLeft.dot % 10 !== dot) {
+                return false;
+            }
+            if (neighborLeft.direction === Right && Math.floor(neighborLeft.dot / 10) !== dot) {
+                return false;
+            }
+        }
+        if (neighborRight) {
+            let dot;
+            if (domino.direction === Left) {
+                dot = domino.dot % 10;
+            } else if (domino.direction === Right) {
+                dot = Math.floor(domino.dot / 10);
+            }
+            if (neighborRight.direction === Left && Math.floor(neighborRight.dot / 10) !== dot) {
+                return false;
+            }
+            if (neighborRight.direction === Right && neighborRight.dot % 10 !== dot) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static getDominoByPlacement(placement) {
+        const keys = Object.keys(AllDominoes);
+        for (let i = 0; i < keys.length; i++) {
+            if (JSON.stringify(AllDominoes[keys[i]].placement) === JSON.stringify(placement)) {
+                return AllDominoes[keys[i]];
+            }
+        }
+    }
+
     onDrop(ev) {
         ev.preventDefault();
-        const placement = { 'x': ev.target.id.split(',')[1], 'y': ev.target.id.split(',')[0] };
+        if (ev.target.id) {
+            const placement = { 'x': ev.target.id.split(',')[1], 'y': ev.target.id.split(',')[0] };
         //TODO - check this if line
-        if (Object.keys(this.state.bank).length > 0) {
-            const idDropped = parseInt(ev.dataTransfer.getData("id"));
+        // if (Object.keys(this.state.bank).length > 0) {
+            const idDropped = parseInt(ev.dataTransfer.getData('id'));
+            if (!Game.isValidPlacement(AllDominoes[idDropped], placement)) {
+                return;
+            }
             let boardCopy = JSON.parse(JSON.stringify(this.state.board));
             boardCopy[idDropped] = AllDominoes[idDropped];
             boardCopy[idDropped].placement = placement;

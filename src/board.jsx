@@ -2,7 +2,6 @@ import React, { Component } from "react";
 
 import "./board.css";
 import { Domino } from "./domino/domino.jsx"
-import PropTypes from 'prop-types';
 
 class Board extends Component {
   constructor(props) {
@@ -19,16 +18,21 @@ class Board extends Component {
       for (let i = 0; i < keys.length; i++) {
           const domino = this.props.dominoes[keys[i]];
           if (domino.placement) {
-              placementToDominoes[domino.placement.x + ',' + domino.placement.y] = domino.dot;
+              placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino.dot;
+          }
+      }
+      let array = [];
+      for (let i = 1; i <= xaxis.length; i++) {
+          for (let j = 1; j<= yaxis.length; j++) {
+              if (i + ',' + j in placementToDominoes) {
+                  array.push(<Domino key={i + ',' + j} domino={this.props.dominoes[placementToDominoes[i + ',' + j]]}/>);
+              } else {
+                  array.push(<div className='placeholder' key={i + ',' + j} id={i + ',' + j}> </div>);
+              }
           }
       }
       return (
-          xaxis.map((i) => (
-              yaxis.map((j) => (
-                  i + ',' + j in placementToDominoes ? <Domino key={i + ',' + j} domino={this.props.dominoes[placementToDominoes[i + ',' + j]]}/> :
-                <div key={i + ',' + j} id={i + ',' + j}>test</div>
-            ))
-          ))
+          array
       );
   }
 
@@ -44,9 +48,5 @@ class Board extends Component {
     return (this.getBoard());
   }
 }
-
-Board.propTypes = {
-    dominoes: PropTypes.instanceOf(Object).isRequired
-};
 
 export default Board;
