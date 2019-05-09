@@ -10,42 +10,38 @@ class Board extends Component {
     };
   }
 
-  getDominoes() {
-      const xaxis = Array.from(Array(3), (x, index) => index + 1);
-      const yaxis = Array.from(Array(3), (x, index) => index + 1);
+  render() {
       const keys = Object.keys(this.props.dominoes);
       const placementToDominoes = {};
       for (let i = 0; i < keys.length; i++) {
           const domino = this.props.dominoes[keys[i]];
-          if (domino.placement) {
-              placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino.dot;
-          }
+          placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino.dot;
       }
-      let array = [];
-      for (let i = 1; i <= xaxis.length; i++) {
-          for (let j = 1; j<= yaxis.length; j++) {
+      const num_rows = this.props.num_rows;
+      const num_cols = this.props.num_cols;
+      let rows = [];
+      for (let i = 1; i <= num_rows; i++){
+          const rowID = `row${i}`;
+          let cell = [];
+          for (let j = 1; j <= num_cols; j++ ){
+              const cellID = `${i},${j}`;
               if (i + ',' + j in placementToDominoes) {
-                  array.push(<Domino key={i + ',' + j} domino={this.props.dominoes[placementToDominoes[i + ',' + j]]}/>);
+                  cell.push(<td key={cellID} id={cellID}><Domino domino={this.props.dominoes[placementToDominoes[cellID]]}/></td>);
               } else {
-                  array.push(<div className='placeholder' key={i + ',' + j} id={i + ',' + j}> </div>);
+                  cell.push(<td className="placeholder" key={cellID} id={cellID}/>);
               }
           }
+          rows.push(<tr key={i} id={rowID}>{cell}</tr>);
       }
-      return (
-          array
-      );
-  }
-
-  getBoard() {
-    return (
-      <div className="board">
-        {this.getDominoes()}
-      </div>
-    );
-  }
-
-  render() {
-    return (this.getBoard());
+      return(
+          <div className="board">
+              <table>
+                  <tbody>
+                  {rows}
+                  </tbody>
+              </table>
+          </div>
+      )
   }
 }
 

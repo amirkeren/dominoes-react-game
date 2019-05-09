@@ -27,8 +27,11 @@ class Game extends Component {
             bank: Object.fromEntries(Object.entries(AllDominoes).filter(([k, ]) => !randomPlayer1Dominoes.includes(k))),
             board: {},
             playsCount: 0,
+            num_rows: 1,
+            num_cols: 1
         };
         this.getData = this.getData.bind(this);
+        console.log(this.state.player1Deck);
     }
 
     getData(val) {
@@ -60,13 +63,19 @@ class Game extends Component {
         const neighborRight = Game.getDominoByPlacement({ x: (x + 1).toString(), y: y.toString() });
         //TODO - handle 0 value, wildcards, horizontal with vertical placement etc.
         if (neighborUp) {
+            //TODO - unsupported for now
+            if (((domino.direction === Left || domino.direction === Right)) ||
+                ((domino.direction === Up || domino.direction === Down) &&
+                (neighborUp.direction === Left || neighborUp.direction === Right))) {
+                return false;
+            }
             let dot;
             if (domino.direction === Up) {
                 dot = Math.floor(domino.dot / 10);
             } else if (domino.direction === Down) {
                 dot = domino.dot % 10;
             }
-            if (neighborUp.direction === Up && dot !== 0 && neighborDown.dot % 10 !== 0 && neighborUp.dot % 10 !== dot) {
+            if (neighborUp.direction === Up && dot !== 0 && neighborUp.dot % 10 !== 0 && neighborUp.dot % 10 !== dot) {
                 return false;
             }
             if (neighborUp.direction === Down && dot !== 0 && Math.floor(neighborUp.dot / 10) !== 0 && Math.floor(neighborUp.dot / 10) !== dot) {
@@ -74,13 +83,19 @@ class Game extends Component {
             }
         }
         if (neighborDown) {
+            //TODO - unsupported for now
+            if (((domino.direction === Left || domino.direction === Right)) ||
+                ((domino.direction === Up || domino.direction === Down) &&
+                    (neighborDown.direction === Left || neighborDown.direction === Right))) {
+                return false;
+            }
             let dot;
             if (domino.direction === Up) {
                 dot = domino.dot % 10;
             } else if (domino.direction === Down) {
                 dot = Math.floor(domino.dot / 10);
             }
-            if (neighborDown.direction === Up && dot !== 0 && Math.floor(neighborLeft.dot / 10) !== 0 && Math.floor(neighborDown.dot / 10) !== dot) {
+            if (neighborDown.direction === Up && dot !== 0 && Math.floor(neighborDown.dot / 10) !== 0 && Math.floor(neighborDown.dot / 10) !== dot) {
                 return false;
             }
             if (neighborDown.direction === Down && dot !== 0 && neighborDown.dot % 10 !== 0 && neighborDown.dot % 10 !== dot) {
@@ -88,13 +103,19 @@ class Game extends Component {
             }
         }
         if (neighborLeft) {
+            //TODO - unsupported for now
+            if (((domino.direction === Left || domino.direction === Right) &&
+                (neighborLeft.direction === Up || neighborLeft.direction === Down)) ||
+                ((domino.direction === Up || domino.direction === Down))) {
+                return false;
+            }
             let dot;
             if (domino.direction === Left) {
                 dot = Math.floor(domino.dot / 10);
             } else if (domino.direction === Right) {
                 dot = domino.dot % 10;
             }
-            if (neighborLeft.direction === Left && dot !== 0 && neighborRight.dot % 10 !== 0 && neighborLeft.dot % 10 !== dot) {
+            if (neighborLeft.direction === Left && dot !== 0 && neighborLeft.dot % 10 !== 0 && neighborLeft.dot % 10 !== dot) {
                 return false;
             }
             if (neighborLeft.direction === Right && dot !== 0 && Math.floor(neighborLeft.dot / 10) !== 0 && Math.floor(neighborLeft.dot / 10) !== dot) {
@@ -102,13 +123,18 @@ class Game extends Component {
             }
         }
         if (neighborRight) {
+            //TODO - unsupported for now
+            if (((domino.direction === Left || domino.direction === Right) &&
+                (neighborRight.direction === Up || neighborRight.direction === Down)) ||
+                ((domino.direction === Up || domino.direction === Down))) {
+                return false;
+            }
             let dot;
             if (domino.direction === Left) {
                 dot = domino.dot % 10;
             } else if (domino.direction === Right) {
                 dot = Math.floor(domino.dot / 10);
             }
-
             if (neighborRight.direction === Left && dot !== 0 && Math.floor(neighborRight.dot / 10) !== 0 && Math.floor(neighborRight.dot / 10) !== dot) {
                 return false;
             }
@@ -141,6 +167,7 @@ class Game extends Component {
             let boardCopy = JSON.parse(JSON.stringify(this.state.board));
             boardCopy[idDropped] = AllDominoes[idDropped];
             boardCopy[idDropped].placement = placement;
+            this.getRowsColsNumber(boardCopy);
             this.setState({
                 player1Deck: Object.fromEntries(Object.entries(this.state.player1Deck).filter(([k, ]) => { return k !== idDropped.toString() })),
                 board: boardCopy,
@@ -177,6 +204,75 @@ class Game extends Component {
         });
     }
 
+    getRowsColsNumber(boardCopy) {
+        const keys = Object.keys(boardCopy);
+        if (keys.length === 1) {
+            let domino = boardCopy[keys[0]];
+            domino.placement.x++;
+            domino.placement.y++;
+            this.state.num_rows += 2;
+            this.state.num_cols += 2;
+            return;
+        }
+        const placementToDominoes = {};
+        for (let i = 0; i < keys.length; i++) {
+            const domino = boardCopy[keys[i]];
+            placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino;
+        }
+        const retvalue = Game.getMinMaxPlacementLocations(placementToDominoes);
+        const min_row = retvalue.min_row;
+        const min_col = retvalue.min_col;
+        const max_row = retvalue.max_row;
+        const max_col = retvalue.max_col;
+        if (parseInt(min_row) === 1) {
+            this.state.num_rows++;
+            for (let i = 0; i < keys.length; i++) {
+                let domino = boardCopy[keys[i]];
+                domino.placement.y++;
+            }
+        }
+        if (parseInt(min_col) === 1) {
+            this.state.num_cols++;
+            for (let i = 0; i < keys.length; i++) {
+                let domino = boardCopy[keys[i]];
+                domino.placement.x++;
+            }
+        }
+        if (parseInt(max_row) === this.state.num_rows) {
+            this.state.num_rows++;
+        }
+        if (parseInt(max_col) === this.state.num_cols) {
+            this.state.num_cols++;
+        }
+    }
+
+    static getMinMaxPlacementLocations(placementToDominoes) {
+        const keys = Object.keys(placementToDominoes);
+        if (keys.length <= 1) {
+            return { 'min_row': 1, 'min_col': 1, 'max_row': 1, 'max_col': 1 };
+        }
+        let min_row = Number.MAX_SAFE_INTEGER;
+        let min_col = Number.MAX_SAFE_INTEGER;
+        let max_row = Number.MIN_SAFE_INTEGER;
+        let max_col = Number.MIN_SAFE_INTEGER;
+        for (let i = 0; i < keys.length; i++) {
+            const placement = placementToDominoes[keys[i]].placement;
+            if (placement.x < min_col) {
+                min_col = placement.x;
+            }
+            if (placement.y < min_row) {
+                min_row = placement.y;
+            }
+            if (placement.x > max_col) {
+                max_col = placement.x;
+            }
+            if (placement.y > max_row) {
+                max_row = placement.y;
+            }
+        }
+        return { 'min_row': min_row, 'min_col': min_col, 'max_row': max_row, 'max_col': max_col };
+    }
+
     render() {
         const endResult = this.getEndResult();
         const bankbtn_class = Object.keys(this.state.bank).length > 0 ? '' : 'bankbtn_hidden';
@@ -189,9 +285,8 @@ class Game extends Component {
                 <h2>board:</h2>
                 <div
                     onDragOver={(e) => Game.onDragOver(e)}
-                    onDrop={(e) => this.onDrop(e)}
-                >
-                    <Board dominoes={this.state.board} />
+                    onDrop={(e) => this.onDrop(e)}>
+                    <Board allDominoes={AllDominoes} dominoes={this.state.board} num_cols={this.state.num_cols} num_rows={this.state.num_rows}/>
                 </div>
                 <h2>Player deck:</h2>
                 <div onDragOver={(e) => Game.onDragOver(e)}>
