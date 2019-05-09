@@ -21,21 +21,20 @@ let AllDominoes = {
 class Game extends Component {
     constructor(props) {
         super(props);
-        let randomPlayer1Dominoes = Game.getRandomPlayer1Dominoes();
+        const randomPlayer1Dominoes = Game.getRandomPlayer1Dominoes();
         this.state = {
-            player1Deck: Object.fromEntries(Object.entries(AllDominoes).filter(([k, ]) => randomPlayer1Dominoes.includes(k))),
-            bank: Object.fromEntries(Object.entries(AllDominoes).filter(([k, ]) => !randomPlayer1Dominoes.includes(k))),
-            board: {},
+            player1Deck: Object.keys(AllDominoes).filter((k) => randomPlayer1Dominoes.includes(k)),
+            bank: Object.keys(AllDominoes).filter((k) => !randomPlayer1Dominoes.includes(k)),
+            board: [],
             playsCount: 0,
             num_rows: 1,
             num_cols: 1
         };
         this.getData = this.getData.bind(this);
-        console.log(this.state.player1Deck);
     }
 
     getData(val) {
-        this.state.player1Deck[val.dot].direction = val.direction;
+        AllDominoes[val.dot].direction = val.direction;
     }
 
     static getRandomPlayer1Dominoes() {
@@ -57,10 +56,10 @@ class Game extends Component {
     static isValidPlacement(domino, placement) {
         const x = parseInt(placement.x);
         const y = parseInt(placement.y);
-        const neighborUp = Game.getDominoByPlacement({ x: x.toString(), y: (y - 1).toString() });
-        const neighborDown = Game.getDominoByPlacement({ x: x.toString(), y: (y + 1).toString() });
-        const neighborLeft = Game.getDominoByPlacement({ x: (x - 1).toString(), y: y.toString() });
-        const neighborRight = Game.getDominoByPlacement({ x: (x + 1).toString(), y: y.toString() });
+        const neighborUp = Game.getDominoByPlacement({ x: x, y: y - 1 });
+        const neighborDown = Game.getDominoByPlacement({ x: x, y: y + 1 });
+        const neighborLeft = Game.getDominoByPlacement({ x: x - 1, y: y });
+        const neighborRight = Game.getDominoByPlacement({ x: x + 1, y: y });
         //TODO - handle 0 value, wildcards, horizontal with vertical placement etc.
         if (neighborUp) {
             //TODO - unsupported for now
@@ -157,19 +156,18 @@ class Game extends Component {
     onDrop(ev) {
         ev.preventDefault();
         if (ev.target.id) {
-            const placement = { 'x': ev.target.id.split(',')[1], 'y': ev.target.id.split(',')[0] };
+            const placement = { 'x': parseInt(ev.target.id.split(',')[1]), 'y': parseInt(ev.target.id.split(',')[0]) };
         //TODO - check this if line
         // if (Object.keys(this.state.bank).length > 0) {
             const idDropped = parseInt(ev.dataTransfer.getData('id'));
             if (!Game.isValidPlacement(AllDominoes[idDropped], placement)) {
                 return;
             }
-            let boardCopy = JSON.parse(JSON.stringify(this.state.board));
-            boardCopy[idDropped] = AllDominoes[idDropped];
-            boardCopy[idDropped].placement = placement;
+            AllDominoes[idDropped].placement = placement;
+            let boardCopy = this.state.board.concat(idDropped);
             this.getRowsColsNumber(boardCopy);
             this.setState({
-                player1Deck: Object.fromEntries(Object.entries(this.state.player1Deck).filter(([k, ]) => { return k !== idDropped.toString() })),
+                player1Deck: this.state.player1Deck.filter((k) => { return k !== idDropped.toString() }),
                 board: boardCopy,
                 bank: this.state.bank,
                 playsCount: this.state.playsCount + 1,
@@ -205,9 +203,8 @@ class Game extends Component {
     }
 
     getRowsColsNumber(boardCopy) {
-        const keys = Object.keys(boardCopy);
-        if (keys.length === 1) {
-            let domino = boardCopy[keys[0]];
+        if (boardCopy.length === 1) {
+            let domino = AllDominoes[boardCopy[0]];
             domino.placement.x++;
             domino.placement.y++;
             this.state.num_rows += 2;
@@ -215,8 +212,8 @@ class Game extends Component {
             return;
         }
         const placementToDominoes = {};
-        for (let i = 0; i < keys.length; i++) {
-            const domino = boardCopy[keys[i]];
+        for (let i = 0; i < boardCopy.length; i++) {
+            const domino = AllDominoes[boardCopy[i]];
             placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino;
         }
         const retvalue = Game.getMinMaxPlacementLocations(placementToDominoes);
@@ -226,15 +223,15 @@ class Game extends Component {
         const max_col = retvalue.max_col;
         if (parseInt(min_row) === 1) {
             this.state.num_rows++;
-            for (let i = 0; i < keys.length; i++) {
-                let domino = boardCopy[keys[i]];
+            for (let i = 0; i < boardCopy.length; i++) {
+                let domino = AllDominoes[boardCopy[i]];
                 domino.placement.y++;
             }
         }
         if (parseInt(min_col) === 1) {
             this.state.num_cols++;
-            for (let i = 0; i < keys.length; i++) {
-                let domino = boardCopy[keys[i]];
+            for (let i = 0; i < boardCopy.length; i++) {
+                let domino = AllDominoes[boardCopy[i]];
                 domino.placement.x++;
             }
         }
@@ -290,7 +287,7 @@ class Game extends Component {
                 </div>
                 <h2>Player deck:</h2>
                 <div onDragOver={(e) => Game.onDragOver(e)}>
-                    <PlayerDeck sendData={this.getData} dominoes={this.state.player1Deck} />
+                    <PlayerDeck allDominoes={AllDominoes} sendData={this.getData} dominoes={this.state.player1Deck} />
                 </div>
                 <button className={bankbtn_class} onClick={() => this.getBankDomino()}>
                     Get domino from the bank

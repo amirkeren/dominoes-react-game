@@ -11,10 +11,9 @@ class Board extends Component {
   }
 
   render() {
-      const keys = Object.keys(this.props.dominoes);
       const placementToDominoes = {};
-      for (let i = 0; i < keys.length; i++) {
-          const domino = this.props.dominoes[keys[i]];
+      for (let i = 0; i < this.props.dominoes.length; i++) {
+          const domino = this.props.allDominoes[this.props.dominoes[i]];
           placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino.dot;
       }
       const num_rows = this.props.num_rows;
@@ -26,7 +25,7 @@ class Board extends Component {
           for (let j = 1; j <= num_cols; j++ ){
               const cellID = `${i},${j}`;
               if (i + ',' + j in placementToDominoes) {
-                  cell.push(<td key={cellID} id={cellID}><Domino domino={this.props.dominoes[placementToDominoes[cellID]]}/></td>);
+                  cell.push(<td key={cellID} id={cellID}><Domino domino={this.props.allDominoes[placementToDominoes[cellID]]}/></td>);
               } else {
                   cell.push(<td className="placeholder" key={cellID} id={cellID}/>);
               }
