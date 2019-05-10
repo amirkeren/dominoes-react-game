@@ -15,15 +15,24 @@ class PlayerDeck extends Component {
     this.props.sendData(val);
   }
 
-  static onDragStart(ev, id) {
+  onDragStart(ev, id) {
     ev.dataTransfer.setData("id", id);
+    this.props.sendDrag(null);
+  }
+
+  onDrag(ev, id) {
+    this.props.sendDrag(id);
+  }
+
+  onDragEnd() {
+    this.props.sendDrag(null);
   }
 
   getDominoes() {
     return (
       this.props.dominoes.map((domino) => (
-        <td key={domino} onDragStart={(e) => PlayerDeck.onDragStart(e, domino)} draggable>
-          <Domino sendData={this.getData} domino={this.props.allDominoes[domino]}/>
+        <td key={domino} onDragEnd={() => this.onDragEnd()} onDrag={(e) => this.onDrag(e, domino)} onDragStart={(e) => this.onDragStart(e, domino)} draggable>
+          <Domino sendData={this.getData} sendDrag={this.onDrag} domino={this.props.allDominoes[domino]}/>
         </td>
       ))
     );

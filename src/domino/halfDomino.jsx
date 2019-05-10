@@ -31,7 +31,7 @@ class HalfDomino extends Component {
 
   getTable() {
     return (
-      <table className="domino">
+      <table className="half_domino">
         <tbody>
           <tr>
             <DotCell isDotted={HalfDomino.isCellDotted(0, this.props.value)} />

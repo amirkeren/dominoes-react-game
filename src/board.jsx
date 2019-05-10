@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import "./board.css";
 import { Domino } from "./domino/domino.jsx"
+import { Down, Up } from "./domino/halfDomino.jsx";
 
 class Board extends Component {
   constructor(props) {
@@ -12,6 +13,7 @@ class Board extends Component {
 
   render() {
       const placementToDominoes = {};
+      const validPlacements = this.props.valid_placements;
       for (let i = 0; i < this.props.dominoes.length; i++) {
           const domino = this.props.allDominoes[this.props.dominoes[i]];
           placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino.dot;
@@ -25,7 +27,19 @@ class Board extends Component {
           for (let j = 1; j <= num_cols; j++ ){
               const cellID = `${i},${j}`;
               if (i + ',' + j in placementToDominoes) {
-                  cell.push(<td key={cellID} id={cellID}><Domino domino={this.props.allDominoes[placementToDominoes[cellID]]}/></td>);
+                  const domino = this.props.allDominoes[placementToDominoes[cellID]];
+                  const cellStyle = {
+                      width: '50px',
+                      height: '50px',
+                      transform: 'rotate(' + domino.direction + 'deg)',
+                  };
+                  if (domino.direction === Up || domino.direction === Down) {
+                      cell.push(<td rowSpan="3" style={cellStyle} key={cellID} id={cellID}><Domino domino={domino}/></td>);
+                  } else {
+                      cell.push(<td colSpan="3" style={cellStyle} key={cellID} id={cellID}><Domino domino={domino}/></td>);
+                  }
+              } else if (validPlacements.includes(i + ',' + j)) {
+                  cell.push(<td className="possible_location_placeholder" key={cellID} id={cellID}/>);
               } else {
                   cell.push(<td className="placeholder" key={cellID} id={cellID}/>);
               }
@@ -33,8 +47,8 @@ class Board extends Component {
           rows.push(<tr key={i} id={rowID}>{cell}</tr>);
       }
       return(
-          <div className="board">
-              <table>
+          <div className="container">
+              <table className="board">
                   <tbody>
                   {rows}
                   </tbody>

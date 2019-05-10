@@ -27,14 +27,27 @@ class Game extends Component {
             bank: Object.keys(AllDominoes).filter((k) => !randomPlayer1Dominoes.includes(k)),
             board: [],
             playsCount: 0,
-            num_rows: 1,
-            num_cols: 1
+            num_rows: 9,
+            num_cols: 9,
+            valid_placements: []
         };
         this.getData = this.getData.bind(this);
+        this.getDrag = this.getDrag.bind(this);
     }
 
     getData(val) {
         AllDominoes[val.dot].direction = val.direction;
+    }
+
+    getDrag(val) {
+        this.setState({
+            board: this.state.board,
+            bank: this.state.bank,
+            playsCount: this.state.playsCount,
+            num_rows: this.state.num_rows,
+            num_cols: this.state.num_cols,
+            valid_placements: val ? this.getValidPlacements(AllDominoes[val]) : []
+        });
     }
 
     static getRandomPlayer1Dominoes() {
@@ -53,13 +66,31 @@ class Game extends Component {
         return (ev.preventDefault());
     }
 
-    static isValidPlacement(domino, placement) {
+    getValidPlacements(domino) {
+        let validPlacements = [];
+        for (let i = 1; i <= this.state.num_rows; i++) {
+            for (let j = 1; j <= this.state.num_cols; j++) {
+                const placement = { x: i, y: j };
+                if (this.isValidPlacement(domino, placement)) {
+                    validPlacements.push(placement.y + ',' + placement.x);
+                }
+            }
+        }
+        return validPlacements;
+    }
+
+    isValidPlacement(domino, placement) {
         const x = parseInt(placement.x);
         const y = parseInt(placement.y);
         const neighborUp = Game.getDominoByPlacement({ x: x, y: y - 1 });
         const neighborDown = Game.getDominoByPlacement({ x: x, y: y + 1 });
         const neighborLeft = Game.getDominoByPlacement({ x: x - 1, y: y });
         const neighborRight = Game.getDominoByPlacement({ x: x + 1, y: y });
+        // console.log("placement", placement);
+        // console.log("up", neighborUp); console.log("down", neighborDown); console.log("left", neighborLeft); console.log("right", neighborRight);
+        if (this.state.board.length > 0 && !neighborUp && !neighborLeft && !neighborRight && !neighborDown) {
+            return false;
+        }
         //TODO - handle 0 value, wildcards, horizontal with vertical placement etc.
         if (neighborUp) {
             //TODO - unsupported for now
@@ -160,17 +191,21 @@ class Game extends Component {
         //TODO - check this if line
         // if (Object.keys(this.state.bank).length > 0) {
             const idDropped = parseInt(ev.dataTransfer.getData('id'));
-            if (!Game.isValidPlacement(AllDominoes[idDropped], placement)) {
+            if (!this.isValidPlacement(AllDominoes[idDropped], placement)) {
                 return;
             }
             AllDominoes[idDropped].placement = placement;
             let boardCopy = this.state.board.concat(idDropped);
-            this.getRowsColsNumber(boardCopy);
+            //TODO - solve resizing bug
+            // this.getRowsColsNumber(boardCopy);
             this.setState({
                 player1Deck: this.state.player1Deck.filter((k) => { return k !== idDropped.toString() }),
                 board: boardCopy,
                 bank: this.state.bank,
                 playsCount: this.state.playsCount + 1,
+                num_rows: this.state.num_rows,
+                num_cols: this.state.num_cols,
+                valid_placements: []
             });
         }
     }
@@ -190,15 +225,16 @@ class Game extends Component {
     }
 
     getBankDomino() {
-        const keys = Object.keys(this.state.bank);
-        const randBankDomino = keys[Math.floor(Math.random() * keys.length)];
-        let player1DeckCopy = JSON.parse(JSON.stringify(this.state.player1Deck));
-        player1DeckCopy[randBankDomino] = AllDominoes[randBankDomino];
+        const randBankDomino = this.state.bank[Math.floor(Math.random() * this.state.bank.length)];
+        let player1DeckCopy = this.state.player1Deck.concat(randBankDomino);
         this.setState({
             player1Deck: player1DeckCopy,
-            bank: Object.fromEntries(Object.entries(this.state.bank).filter(([k, ]) => k !== randBankDomino)),
+            bank: this.state.bank.filter((k) => k !== randBankDomino),
             board: this.state.board,
             playsCount: this.state.playsCount,
+            num_rows: this.state.num_rows,
+            num_cols: this.state.num_cols,
+            valid_placements: this.state.valid_placements
         });
     }
 
@@ -272,7 +308,7 @@ class Game extends Component {
 
     render() {
         const endResult = this.getEndResult();
-        const bankbtn_class = Object.keys(this.state.bank).length > 0 ? '' : 'bankbtn_hidden';
+        const bankbtn_class = this.state.bank.length > 0 || this.state.player1Deck.length > 0 ? '' : 'bankbtn_hidden';
         return (
             <div>
                 <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
@@ -283,11 +319,11 @@ class Game extends Component {
                 <div
                     onDragOver={(e) => Game.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e)}>
-                    <Board allDominoes={AllDominoes} dominoes={this.state.board} num_cols={this.state.num_cols} num_rows={this.state.num_rows}/>
+                    <Board allDominoes={AllDominoes} valid_placements={this.state.valid_placements} dominoes={this.state.board} num_cols={this.state.num_cols} num_rows={this.state.num_rows}/>
                 </div>
                 <h2>Player deck:</h2>
                 <div onDragOver={(e) => Game.onDragOver(e)}>
-                    <PlayerDeck allDominoes={AllDominoes} sendData={this.getData} dominoes={this.state.player1Deck} />
+                    <PlayerDeck allDominoes={AllDominoes} sendDrag={this.getDrag} sendData={this.getData} dominoes={this.state.player1Deck} />
                 </div>
                 <button className={bankbtn_class} onClick={() => this.getBankDomino()}>
                     Get domino from the bank

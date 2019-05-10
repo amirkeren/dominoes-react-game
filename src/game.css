@@ -13,7 +13,7 @@ h3 {
 }
 
 button {
-  font-family: Verdana;
+  font-family: Verdana, serif;
   font-size: 1em;
   color: white;
   background-image: -webkit-linear-gradient(top, grey, dimgrey);

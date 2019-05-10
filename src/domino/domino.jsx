@@ -41,14 +41,23 @@ class Domino extends Component {
     const divStyle = {
       border: '1px solid black',
       transform: 'rotate(' + deg + 'deg)',
-      gridColumnStart: this.props.domino.placement ? this.props.domino.placement.x : 0,
-      gridColumnEnd: this.props.domino.placement ? this.props.domino.placement.x : 0,
-      gridRowStart: this.props.domino.placement ? this.props.domino.placement.y : 0,
-      gridRowEnd: this.props.domino.placement ? this.props.domino.placement.y : 0,
+      borderRadius: '5px',
+      width: '100%',
+      height: '100%',
     };
+    /*const dominoStyle = {
+      backgroundColor: 'white',
+      transform: 'rotate(' + deg + 'deg)',
+      border: '1px solid black',
+      borderRadius: '5px',
+      borderCollapse: 'collapse',
+      borderSpacing: 0,
+      width: '100%',
+      height: '100%'
+    };*/
     return (
         <div style={divStyle} onClick={this.onClick}>
-          <table className="domino">
+          <table border="1" className="domino">
             <tbody>
               <tr>
                 <td><HalfDomino value={dots1}/></td>
