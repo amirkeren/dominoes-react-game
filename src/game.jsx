@@ -42,7 +42,8 @@ class Game extends Component {
             valid_placements: [],
             pieces_taken: 0,
             total_score: 0,
-            elapsed_time: 0
+            elapsed_time: 0,
+            plays: []
         };
         this.getData = this.getData.bind(this);
         this.getDrag = this.getDrag.bind(this);
@@ -217,22 +218,27 @@ class Game extends Component {
 
     getEndResult() {
         if (this.state.player1Deck.length === 0) {
+            clearInterval(this.interval);
             return "Player wins!";
         } else {
             if (this.state.bank.length === 0) {
+                clearInterval(this.interval);
                 return "Player loses!"
             }
         }
     }
 
     getBankDomino() {
-        const randBankDomino = this.state.bank[Math.floor(Math.random() * this.state.bank.length)];
-        let player1DeckCopy = this.state.player1Deck.concat(randBankDomino);
-        this.setState({
-            player1Deck: player1DeckCopy,
-            bank: this.state.bank.filter((k) => k !== randBankDomino),
-            pieces_taken: this.state.pieces_taken + 1
-        });
+        if (this.state.bank.length > 0) {
+            const randBankDomino = this.state.bank[Math.floor(Math.random() * this.state.bank.length)];
+            let player1DeckCopy = this.state.player1Deck.concat(randBankDomino);
+            this.setState({
+                player1Deck: player1DeckCopy,
+                bank: this.state.bank.filter((k) => k !== randBankDomino),
+                pieces_taken: this.state.pieces_taken + 1,
+                plays_count: this.state.plays_count + 1
+            });
+        }
     }
 
     static resizeBoardIfNeeded(board) {
@@ -292,11 +298,11 @@ class Game extends Component {
 
     render() {
         const endResult = this.getEndResult();
-        const bankbtn_class = this.state.bank.length > 0 || this.state.player1Deck.length > 0 ? '' : 'bankbtn_hidden';
         const temp_mins = Math.floor(this.state.elapsed_time / 60);
         const temp_secs = Math.floor(this.state.elapsed_time % 60);
         const mins = temp_mins < 10 ? '0' + temp_mins : temp_mins;
         const secs = temp_secs < 10 ? '0' + temp_secs : temp_secs;
+        const avg = this.state.plays_count > 0 ? Math.floor(this.state.elapsed_time / this.state.plays_count) : 0;
         return (
             <div>
                 <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
@@ -307,13 +313,13 @@ class Game extends Component {
                     <Board allDominoes={AllDominoes} valid_placements={this.state.valid_placements} dominoes={this.state.board} num_cols={this.state.num_cols} num_rows={this.state.num_rows}/>
                 </div>
                 <div className="time_control">
-                    <button onClick={() => this.prevStep()}>
+                    <button disabled={!endResult} onClick={() => this.prevStep()}>
                         Prev
                     </button>
                     <button onClick={() => Game.onReset()}>
                         Reset
                     </button>
-                    <button onClick={() => this.nextStep()}>
+                    <button disabled={!endResult} onClick={() => this.nextStep()}>
                         Next
                     </button>
                 </div>
@@ -321,13 +327,13 @@ class Game extends Component {
                 <div onDragOver={(e) => Game.onDragOver(e)}>
                     <PlayerDeck allDominoes={AllDominoes} sendDrag={this.getDrag} sendData={this.getData} dominoes={this.state.player1Deck} />
                 </div>
-                <button className={bankbtn_class} onClick={() => this.getBankDomino()}>
+                <button disabled={endResult} onClick={() => this.getBankDomino()}>
                     Get domino from the bank
                 </button>
                 <div className="statistics">
                     <h4>Plays counter: {this.state.plays_count}</h4>
                     <h4>Elapsed time: {mins + ':' + secs}</h4>
-                    <h4>Average time: {this.state.plays_count}</h4>
+                    <h4>Average time: {avg + 's'}</h4>
                     <h4>Pieces taken: {this.state.pieces_taken}</h4>
                     <h4>Total score: {this.state.total_score}</h4>
                 </div>
