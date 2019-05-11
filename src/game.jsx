@@ -280,23 +280,35 @@ class Game extends Component {
                 }
             }
         }
-        if (min_row === 0 || max_row === board.length - 1) {
-            for (let i = 0; i < 3; i++) {
+        if (min_row < 3 || max_row > board.length - 4) {
+            let rowsToAdd;
+            if (min_row < 3) {
+                rowsToAdd = 3 - min_row;
+            } else {
+                rowsToAdd = 4 - (board.length - max_row);
+            }
+            for (let i = 0; i < rowsToAdd; i++) {
                 let new_row = new Array(board[0].length);
                 for (let j = 0; j < new_row.length; j++) {
                     new_row[j] = { dot: Empty };
                 }
-                if (min_row === 0) {
+                if (min_row < 3) {
                     board.unshift(new_row);
                 } else {
                     board.push(new_row);
                 }
             }
         }
-        if (min_col === 0 || max_col === board[0].length - 1) {
+        if (min_col < 3 || max_col > board[0].length - 4) {
+            let colsToAdd;
+            if (min_col < 3) {
+                colsToAdd = 3 - min_col;
+            } else {
+                colsToAdd = 4 - (board[0].length - max_col);
+            }
             for (let i = 0; i < board.length; i++) {
-                for (let j = 0; j < 3; j++) {
-                    if (min_col === 0) {
+                for (let j = 0; j < colsToAdd; j++) {
+                    if (min_col < 3) {
                         board[i].unshift({ dot: Empty });
                     } else {
                         board[i].push({ dot: Empty });
