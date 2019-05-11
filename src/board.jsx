@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import "./board.css";
-import { HalfDomino } from "./domino/halfDomino.jsx";
+import { HalfDomino, Left, Right } from "./domino/halfDomino.jsx";
 import { Empty, Separator } from "./game.jsx";
 
 class Board extends Component {
@@ -27,10 +27,18 @@ class Board extends Component {
                       }
                       break;
                   case Separator:
-                      cell.push(<td key={cellID} className="separator" id={cellID}/>);
+                      if (this.props.dominoes[i][j].direction === Left || this.props.dominoes[i][j].direction === Right) {
+                          cell.push(<td key={cellID} className="separator_container" id={cellID}><div className="separator"/></td>);
+                      } else {
+                          cell.push(<td key={cellID} className="separator_container_vertical" id={cellID}><h5 className="separator_vertical"/></td>);
+                      }
                       break;
                   default:
-                      cell.push(<td key={cellID} className="cell" id={cellID}><HalfDomino value={this.props.dominoes[i][j].dot}/></td>);
+                      if (this.props.dominoes[i][j].direction === Left || this.props.dominoes[i][j].direction === Right) {
+                          cell.push(<td key={cellID} className="cell" id={cellID}><HalfDomino value={this.props.dominoes[i][j].dot}/></td>);
+                      } else {
+                          cell.push(<td key={cellID} className="cell_vertical" id={cellID}><HalfDomino value={this.props.dominoes[i][j].dot}/></td>);
+                      }
               }
           }
           rows.push(<tr key={i} id={rowID}>{cell}</tr>);

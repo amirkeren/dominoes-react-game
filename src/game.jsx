@@ -108,7 +108,7 @@ class Game extends Component {
         const y = parseInt(placement.y);
         const num_rows = this.state.board.length;
         const num_cols = this.state.board[0].length;
-        if (this.state.plays_count === 0) {
+        if (this.state.total_score === 0) {
             return x < num_rows - 1 && x > 0 && y < num_cols - 1 && y > 0;
         }
         let dots1 = Math.floor(domino.dot / 10);
