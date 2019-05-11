@@ -27,3 +27,22 @@ button {
 .bankbtn_hidden {
   visibility: hidden;
 }
+
+.time_control {
+  text-align: center;
+}
+
+.time_control button {
+  display: inline;
+  margin-right: 10px;
+}
+
+.statistics {
+  text-align: center;
+  padding: 5px;
+}
+
+.statistics h4 {
+  display: inline;
+  padding: 5px;
+}

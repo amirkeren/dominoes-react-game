@@ -38,13 +38,26 @@ class Game extends Component {
             player1Deck: Object.keys(AllDominoes).filter((k) => randomPlayer1Dominoes.includes(k)),
             bank: Object.keys(AllDominoes).filter((k) => !randomPlayer1Dominoes.includes(k)),
             board: board,
-            playsCount: 0,
-            num_rows: 9,
-            num_cols: 9,
-            valid_placements: []
+            plays_count: 0,
+            valid_placements: [],
+            pieces_taken: 0,
+            total_score: 0,
+            elapsed_time: 0
         };
         this.getData = this.getData.bind(this);
         this.getDrag = this.getDrag.bind(this);
+    }
+
+    componentDidMount() {
+        this.interval = setInterval(() => {
+            this.setState({
+                    elapsed_time: this.state.elapsed_time + 1}
+                );
+        }, 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     getData(val) {
@@ -53,12 +66,7 @@ class Game extends Component {
 
     getDrag(val) {
         this.setState({
-            board: this.state.board,
-            bank: this.state.bank,
-            playsCount: this.state.playsCount,
-            num_rows: this.state.num_rows,
-            num_cols: this.state.num_cols,
-            valid_placements: val ? this.getValidPlacements(AllDominoes[val]) : []
+            valid_placements: val ? this.getValidPlacements(AllDominoes[val]) : [],
         });
     }
 
@@ -96,7 +104,7 @@ class Game extends Component {
         const y = parseInt(placement.y);
         const num_rows = this.state.board.length;
         const num_cols = this.state.board[0].length;
-        if (this.state.playsCount === 0) {
+        if (this.state.plays_count === 0) {
             return x < num_rows - 1 && x > 0 && y < num_cols - 1 && y > 0;
         }
         let dots1 = Math.floor(domino.dot / 10);
@@ -157,15 +165,6 @@ class Game extends Component {
         return false;
     }
 
-    static getDominoByPlacement(placement) {
-        const keys = Object.keys(AllDominoes);
-        for (let i = 0; i < keys.length; i++) {
-            if (JSON.stringify(AllDominoes[keys[i]].placement) === JSON.stringify(placement)) {
-                return AllDominoes[keys[i]];
-            }
-        }
-    }
-
     onDrop(ev) {
         ev.preventDefault();
         if (ev.target.id) {
@@ -201,16 +200,13 @@ class Game extends Component {
                 boardCopy[placement.x + 1][placement.y].dot = dots2;
                 boardCopy[placement.x + 1][placement.y].direction = domino.direction;;
             }
-            //TODO - solve resizing bug
-            // this.getRowsColsNumber(boardCopy);
+            Game.resizeBoardIfNeeded(boardCopy);
             this.setState({
                 player1Deck: this.state.player1Deck.filter((k) => { return k !== idDropped.toString() }),
                 board: boardCopy,
-                bank: this.state.bank,
-                playsCount: this.state.playsCount + 1,
-                num_rows: this.state.num_rows,
-                num_cols: this.state.num_cols,
-                valid_placements: []
+                plays_count: this.state.plays_count + 1,
+                valid_placements: [],
+                total_score: this.state.total_score + dots1 + dots2
             });
         }
     }
@@ -235,96 +231,91 @@ class Game extends Component {
         this.setState({
             player1Deck: player1DeckCopy,
             bank: this.state.bank.filter((k) => k !== randBankDomino),
-            board: this.state.board,
-            playsCount: this.state.playsCount,
-            num_rows: this.state.num_rows,
-            num_cols: this.state.num_cols,
-            valid_placements: this.state.valid_placements
+            pieces_taken: this.state.pieces_taken + 1
         });
     }
 
-    getRowsColsNumber(boardCopy) {
-        if (boardCopy.length === 1) {
-            let domino = AllDominoes[boardCopy[0]];
-            domino.placement.x++;
-            domino.placement.y++;
-            this.state.num_rows += 2;
-            this.state.num_cols += 2;
-            return;
-        }
-        const placementToDominoes = {};
-        for (let i = 0; i < boardCopy.length; i++) {
-            const domino = AllDominoes[boardCopy[i]];
-            placementToDominoes[domino.placement.y + ',' + domino.placement.x] = domino;
-        }
-        const retvalue = Game.getMinMaxPlacementLocations(placementToDominoes);
-        const min_row = retvalue.min_row;
-        const min_col = retvalue.min_col;
-        const max_row = retvalue.max_row;
-        const max_col = retvalue.max_col;
-        if (parseInt(min_row) === 1) {
-            this.state.num_rows++;
-            for (let i = 0; i < boardCopy.length; i++) {
-                let domino = AllDominoes[boardCopy[i]];
-                domino.placement.y++;
+    static resizeBoardIfNeeded(board) {
+        let min_row = board.length;
+        let min_col = board[0].length;
+        let max_row = 0;
+        let max_col = 0;
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                if (board[i][j].dot !== Empty && i < min_row) {
+                    min_row = i;
+                }
+                if (board[i][j].dot !== Empty && i > max_row) {
+                    max_row = i;
+                }
+                if (board[i][j].dot !== Empty && j < min_col) {
+                    min_col = j;
+                }
+                if (board[i][j].dot !== Empty && j > max_col) {
+                    max_col = j;
+                }
             }
         }
-        if (parseInt(min_col) === 1) {
-            this.state.num_cols++;
-            for (let i = 0; i < boardCopy.length; i++) {
-                let domino = AllDominoes[boardCopy[i]];
-                domino.placement.x++;
+        if (min_row === 0 || max_row === board.length - 1) {
+            for (let i = 0; i < 3; i++) {
+                let new_row = new Array(board[0].length);
+                for (let j = 0; j < new_row.length; j++) {
+                    new_row[j] = { dot: Empty };
+                }
+                if (min_row === 0) {
+                    board.unshift(new_row);
+                } else {
+                    board.push(new_row);
+                }
             }
         }
-        if (parseInt(max_row) === this.state.num_rows) {
-            this.state.num_rows++;
-        }
-        if (parseInt(max_col) === this.state.num_cols) {
-            this.state.num_cols++;
+        if (min_col === 0 || max_col === board[0].length - 1) {
+            for (let i = 0; i < board.length; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (min_col === 0) {
+                        board[i].unshift({ dot: Empty });
+                    } else {
+                        board[i].push({ dot: Empty });
+                    }
+                }
+            }
         }
     }
 
-    static getMinMaxPlacementLocations(placementToDominoes) {
-        const keys = Object.keys(placementToDominoes);
-        if (keys.length <= 1) {
-            return { 'min_row': 1, 'min_col': 1, 'max_row': 1, 'max_col': 1 };
-        }
-        let min_row = Number.MAX_SAFE_INTEGER;
-        let min_col = Number.MAX_SAFE_INTEGER;
-        let max_row = Number.MIN_SAFE_INTEGER;
-        let max_col = Number.MIN_SAFE_INTEGER;
-        for (let i = 0; i < keys.length; i++) {
-            const placement = placementToDominoes[keys[i]].placement;
-            if (placement.x < min_col) {
-                min_col = placement.x;
-            }
-            if (placement.y < min_row) {
-                min_row = placement.y;
-            }
-            if (placement.x > max_col) {
-                max_col = placement.x;
-            }
-            if (placement.y > max_row) {
-                max_row = placement.y;
-            }
-        }
-        return { 'min_row': min_row, 'min_col': min_col, 'max_row': max_row, 'max_col': max_col };
+    nextStep() {
+        console.log("Unsupported yet");
+    }
+
+    prevStep() {
+        console.log("Unsupported yet");
     }
 
     render() {
         const endResult = this.getEndResult();
         const bankbtn_class = this.state.bank.length > 0 || this.state.player1Deck.length > 0 ? '' : 'bankbtn_hidden';
+        const temp_mins = Math.floor(this.state.elapsed_time / 60);
+        const temp_secs = Math.floor(this.state.elapsed_time % 60);
+        const mins = temp_mins < 10 ? '0' + temp_mins : temp_mins;
+        const secs = temp_secs < 10 ? '0' + temp_secs : temp_secs;
         return (
             <div>
                 <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
-                <button onClick={() => Game.onReset()}>
-                    Reset
-                </button>
-                <h2>board:</h2>
+                <h2>Board:</h2>
                 <div
                     onDragOver={(e) => Game.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e)}>
                     <Board allDominoes={AllDominoes} valid_placements={this.state.valid_placements} dominoes={this.state.board} num_cols={this.state.num_cols} num_rows={this.state.num_rows}/>
+                </div>
+                <div className="time_control">
+                    <button onClick={() => this.prevStep()}>
+                        Prev
+                    </button>
+                    <button onClick={() => Game.onReset()}>
+                        Reset
+                    </button>
+                    <button onClick={() => this.nextStep()}>
+                        Next
+                    </button>
                 </div>
                 <h2>Player deck:</h2>
                 <div onDragOver={(e) => Game.onDragOver(e)}>
@@ -333,7 +324,13 @@ class Game extends Component {
                 <button className={bankbtn_class} onClick={() => this.getBankDomino()}>
                     Get domino from the bank
                 </button>
-                <h2>Plays counter: {this.state.playsCount}</h2>
+                <div className="statistics">
+                    <h4>Plays counter: {this.state.plays_count}</h4>
+                    <h4>Elapsed time: {mins + ':' + secs}</h4>
+                    <h4>Average time: {this.state.plays_count}</h4>
+                    <h4>Pieces taken: {this.state.pieces_taken}</h4>
+                    <h4>Total score: {this.state.total_score}</h4>
+                </div>
                 <h3>{endResult}</h3>
             </div >
         );
