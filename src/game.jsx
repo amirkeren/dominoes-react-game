@@ -21,6 +21,10 @@ let AllDominoes = {
     66: { dot: 66, direction: Left }
 };
 
+let plays = [];
+let playsIndex;
+let gameOver = false;
+
 class Game extends Component {
     constructor(props) {
         super(props);
@@ -43,7 +47,6 @@ class Game extends Component {
             pieces_taken: 0,
             total_score: 0,
             elapsed_time: 0,
-            plays: []
         };
         this.getData = this.getData.bind(this);
         this.getDrag = this.getDrag.bind(this);
@@ -174,6 +177,18 @@ class Game extends Component {
             if (!this.isValidPlacement(AllDominoes[idDropped], placement)) {
                 return;
             }
+            let stateCopy = Object.assign({}, this.state);
+            delete stateCopy.valid_placements;
+            let boardDeepCopy = new Array(this.state.board.length);
+            for (let i = 0; i < this.state.board.length; i++) {
+                boardDeepCopy[i] = new Array(this.state.board[i].length);
+                for (let j = 0; j < this.state.board[i].length; j++) {
+                    boardDeepCopy[i][j] = { dot: this.state.board[i][j].dot };
+                }
+            }
+            stateCopy.board = boardDeepCopy;
+            plays.push(stateCopy);
+            console.log(plays);
             const domino = AllDominoes[idDropped];
             AllDominoes[idDropped].placement = placement;
             let boardCopy = this.state.board;
@@ -219,12 +234,12 @@ class Game extends Component {
     getEndResult() {
         if (this.state.player1Deck.length === 0) {
             clearInterval(this.interval);
+            gameOver = true;
             return "Player wins!";
-        } else {
-            if (this.state.bank.length === 0) {
-                clearInterval(this.interval);
-                return "Player loses!"
-            }
+        } else if (this.state.bank.length === 0) {
+            clearInterval(this.interval);
+            gameOver = true;
+            return "Player loses!"
         }
     }
 
@@ -232,6 +247,9 @@ class Game extends Component {
         if (this.state.bank.length > 0) {
             const randBankDomino = this.state.bank[Math.floor(Math.random() * this.state.bank.length)];
             let player1DeckCopy = this.state.player1Deck.concat(randBankDomino);
+            let stateCopy = Object.assign({}, this.state);
+            delete stateCopy.valid_placements;
+            plays.push(stateCopy);
             this.setState({
                 player1Deck: player1DeckCopy,
                 bank: this.state.bank.filter((k) => k !== randBankDomino),
@@ -289,11 +307,14 @@ class Game extends Component {
     }
 
     nextStep() {
-        console.log("Unsupported yet");
+        this.setState(plays[++playsIndex]);
     }
 
     prevStep() {
-        console.log("Unsupported yet");
+        if (!playsIndex) {
+            playsIndex = plays.length - 1;
+        }
+        this.setState(plays[--playsIndex]);
     }
 
     render() {
@@ -310,16 +331,16 @@ class Game extends Component {
                 <div
                     onDragOver={(e) => Game.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e)}>
-                    <Board allDominoes={AllDominoes} valid_placements={this.state.valid_placements} dominoes={this.state.board} num_cols={this.state.num_cols} num_rows={this.state.num_rows}/>
+                    <Board allDominoes={AllDominoes} valid_placements={this.state.valid_placements} dominoes={this.state.board}/>
                 </div>
                 <div className="time_control">
-                    <button disabled={!endResult} onClick={() => this.prevStep()}>
+                    <button disabled={(gameOver && playsIndex === 0) || !gameOver} onClick={() => this.prevStep()}>
                         Prev
                     </button>
-                    <button onClick={() => Game.onReset()}>
+                    <button disabled={!gameOver} onClick={() => Game.onReset()}>
                         Reset
                     </button>
-                    <button disabled={!endResult} onClick={() => this.nextStep()}>
+                    <button disabled={(gameOver && playsIndex === undefined || playsIndex === plays.length - 1) || !gameOver} onClick={() => this.nextStep()}>
                         Next
                     </button>
                 </div>
@@ -327,7 +348,7 @@ class Game extends Component {
                 <div onDragOver={(e) => Game.onDragOver(e)}>
                     <PlayerDeck allDominoes={AllDominoes} sendDrag={this.getDrag} sendData={this.getData} dominoes={this.state.player1Deck} />
                 </div>
-                <button disabled={endResult} onClick={() => this.getBankDomino()}>
+                <button disabled={gameOver} onClick={() => this.getBankDomino()}>
                     Get domino from the bank
                 </button>
                 <div className="statistics">
