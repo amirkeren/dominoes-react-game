@@ -45,16 +45,6 @@ class Domino extends Component {
       width: '100%',
       height: '100%',
     };
-    /*const dominoStyle = {
-      backgroundColor: 'white',
-      transform: 'rotate(' + deg + 'deg)',
-      border: '1px solid black',
-      borderRadius: '5px',
-      borderCollapse: 'collapse',
-      borderSpacing: 0,
-      width: '100%',
-      height: '100%'
-    };*/
     return (
         <div style={divStyle} onClick={this.onClick}>
           <table border="1" className="domino">

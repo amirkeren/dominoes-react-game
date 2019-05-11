@@ -24,6 +24,7 @@ class Board extends Component {
       for (let i = 1; i <= num_rows; i++){
           const rowID = `row${i}`;
           let cell = [];
+          let cellsToRemove = [];
           for (let j = 1; j <= num_cols; j++ ){
               const cellID = `${i},${j}`;
               if (i + ',' + j in placementToDominoes) {
@@ -34,14 +35,21 @@ class Board extends Component {
                       transform: 'rotate(' + domino.direction + 'deg)',
                   };
                   if (domino.direction === Up || domino.direction === Down) {
-                      cell.push(<td rowSpan="3" style={cellStyle} key={cellID} id={cellID}><Domino domino={domino}/></td>);
+                      cell.push(<td rowSpan="2" style={cellStyle} key={cellID} id={cellID}><Domino domino={domino}/>
+                      </td>);
+                      cellsToRemove.push((i + 1) + ',' + j);
                   } else {
-                      cell.push(<td colSpan="3" style={cellStyle} key={cellID} id={cellID}><Domino domino={domino}/></td>);
+                      cell.push(<td colSpan="2" style={cellStyle} key={cellID} id={cellID}><Domino domino={domino}/>
+                      </td>);
+                      cellsToRemove.push(i + ',' + (j + 1));
+                      console.log(cellsToRemove);
                   }
-              } else if (validPlacements.includes(i + ',' + j)) {
+              } else if (!cellsToRemove.includes(i + ',' + j)) {
+                if (validPlacements.includes(i + ',' + j)) {
                   cell.push(<td className="possible_location_placeholder" key={cellID} id={cellID}/>);
-              } else {
+                } else {
                   cell.push(<td className="placeholder" key={cellID} id={cellID}/>);
+                }
               }
           }
           rows.push(<tr key={i} id={rowID}>{cell}</tr>);
