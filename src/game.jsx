@@ -8,6 +8,9 @@ import { Left, Right, Up, Down } from "./domino/halfDomino.jsx";
 
 const PlayerInitialDominoesCount = 6;
 
+export const Empty = -1;
+export const Separator = -2;
+
 let AllDominoes = {
     0:  { dot: 0,  direction: Left }, 1:  { dot: 1,  direction: Left }, 2:  { dot: 2,  direction: Left }, 3:  { dot: 3,  direction: Left }, 4:  { dot: 4,  direction: Left }, 5:  { dot: 5,  direction: Left }, 6:  { dot: 6,  direction: Left },
     11: { dot: 11, direction: Left }, 12: { dot: 12, direction: Left }, 13: { dot: 13, direction: Left }, 14: { dot: 14, direction: Left }, 15: { dot: 15, direction: Left }, 16: { dot: 16 , direction: Left },
@@ -22,10 +25,19 @@ class Game extends Component {
     constructor(props) {
         super(props);
         const randomPlayer1Dominoes = Game.getRandomPlayer1Dominoes();
+        const num_rows = 9;
+        const num_cols = 9;
+        let board = new Array(num_rows);
+        for (let i = 0; i < num_rows; i++) {
+            board[i] = new Array(num_cols);
+            for (let j = 0; j < num_cols; j++) {
+                board[i][j] = { dot: Empty };
+            }
+        }
         this.state = {
             player1Deck: Object.keys(AllDominoes).filter((k) => randomPlayer1Dominoes.includes(k)),
             bank: Object.keys(AllDominoes).filter((k) => !randomPlayer1Dominoes.includes(k)),
-            board: [],
+            board: board,
             playsCount: 0,
             num_rows: 9,
             num_cols: 9,
@@ -68,11 +80,11 @@ class Game extends Component {
 
     getValidPlacements(domino) {
         let validPlacements = [];
-        for (let i = 1; i <= this.state.num_rows; i++) {
-            for (let j = 1; j <= this.state.num_cols; j++) {
+        for (let i = 0; i < this.state.board.length; i++) {
+            for (let j = 0; j < this.state.board[i].length; j++) {
                 const placement = { x: i, y: j };
                 if (this.isValidPlacement(domino, placement)) {
-                    validPlacements.push(placement.y + ',' + placement.x);
+                    validPlacements.push(placement.x + ',' + placement.y);
                 }
             }
         }
@@ -82,97 +94,67 @@ class Game extends Component {
     isValidPlacement(domino, placement) {
         const x = parseInt(placement.x);
         const y = parseInt(placement.y);
-        const neighborUp = Game.getDominoByPlacement({ x: x, y: y - 1 });
-        const neighborDown = Game.getDominoByPlacement({ x: x, y: y + 1 });
-        const neighborLeft = Game.getDominoByPlacement({ x: x - 1, y: y });
-        const neighborRight = Game.getDominoByPlacement({ x: x + 1, y: y });
-        // console.log("placement", placement);
-        // console.log("up", neighborUp); console.log("down", neighborDown); console.log("left", neighborLeft); console.log("right", neighborRight);
-        if (this.state.board.length > 0 && !neighborUp && !neighborLeft && !neighborRight && !neighborDown) {
-            return false;
+        const num_rows = this.state.board.length;
+        const num_cols = this.state.board[0].length;
+        if (this.state.playsCount === 0) {
+            return x < num_rows - 1 && x > 0 && y < num_cols - 1 && y > 0;
         }
-        //TODO - handle 0 value, wildcards, horizontal with vertical placement etc.
-        if (neighborUp) {
-            //TODO - unsupported for now
-            if (((domino.direction === Left || domino.direction === Right)) ||
-                ((domino.direction === Up || domino.direction === Down) &&
-                (neighborUp.direction === Left || neighborUp.direction === Right))) {
+        let dots1 = Math.floor(domino.dot / 10);
+        let dots2 = Math.floor(domino.dot % 10);
+        if (domino.direction === Left || domino.direction === Right) {
+            //if already occupied
+            if (this.state.board[x][y].dot !== Empty || this.state.board[x][Math.max(0, y - 1)].dot !== Empty || this.state.board[x][Math.min(num_cols - 1, y + 1)].dot !== Empty) {
                 return false;
             }
-            let dot;
-            if (domino.direction === Up) {
-                dot = Math.floor(domino.dot / 10);
-            } else if (domino.direction === Down) {
-                dot = domino.dot % 10;
+            if (domino.direction === Right) {
+                const temp = dots1;
+                dots1 = dots2;
+                dots2 = temp;
             }
-            if (neighborUp.direction === Up && dot !== 0 && neighborUp.dot % 10 !== 0 && neighborUp.dot % 10 !== dot) {
+            //to the right normal
+            if (y >= 2 && y < num_cols - 1 && (this.state.board[x][y - 2].direction === Left || this.state.board[x][y - 2].direction === Right) && (this.state.board[x][y - 2].dot === dots1 || dots1 === 0 || this.state.board[x][y - 2].dot === 0)) {
+                return true;
+            }
+            //to the right separator
+            if (y >= 2 && x >= 1 && x < num_rows - 1 && (this.state.board[x][y - 2].direction === Up || this.state.board[x][y - 2].direction === Down) && this.state.board[x][y - 2].dot === Separator && this.state.board[x - 1][y - 2].dot === this.state.board[x + 1][y - 2].dot && (this.state.board[x + 1][y - 2].dot === 0 || dots1 === 0 || this.state.board[x + 1][y - 2].dot === dots1)) {
+                return true;
+            }
+            //to the left normal
+            if (y > 0 && y < num_cols - 2 && (this.state.board[x][y + 2].direction === Left || this.state.board[x][y + 2].direction === Right) && (this.state.board[x][y + 2].dot === dots2 || dots2 === 0 || this.state.board[x][y + 2].dot === 0)) {
+                return true;
+            }
+            //to the left separator
+            if (y < num_cols - 2 && x >= 1 && x < num_rows - 1 && (this.state.board[x][y + 2].direction === Up || this.state.board[x][y + 2].direction === Down) && this.state.board[x][y + 2].dot === Separator && this.state.board[x - 1][y + 2].dot === this.state.board[x + 1][y + 2].dot && (this.state.board[x + 1][y + 2].dot === 0 || dots2 === 0 || this.state.board[x + 1][y + 2].dot === dots2)) {
+                return true;
+            }
+        } else {
+            //if already occupied
+            if (this.state.board[x][y].dot !== Empty || this.state.board[Math.max(0, x - 1)][y].dot !== Empty || this.state.board[Math.min(num_rows - 1, x + 1)][y].dot !== Empty) {
                 return false;
             }
-            if (neighborUp.direction === Down && dot !== 0 && Math.floor(neighborUp.dot / 10) !== 0 && Math.floor(neighborUp.dot / 10) !== dot) {
-                return false;
+            if (domino.direction === Down) {
+                const temp = dots1;
+                dots1 = dots2;
+                dots2 = temp;
             }
-        }
-        if (neighborDown) {
-            //TODO - unsupported for now
-            if (((domino.direction === Left || domino.direction === Right)) ||
-                ((domino.direction === Up || domino.direction === Down) &&
-                    (neighborDown.direction === Left || neighborDown.direction === Right))) {
-                return false;
+            //below normal
+            if (x >= 2 && x < num_rows - 1 && (this.state.board[x - 2][y].direction === Up || this.state.board[x - 2][y].direction === Down) && (this.state.board[x - 2][y].dot === dots1 || dots1 === 0 || this.state.board[x - 2][y].dot === 0)) {
+                return true;
             }
-            let dot;
-            if (domino.direction === Up) {
-                dot = domino.dot % 10;
-            } else if (domino.direction === Down) {
-                dot = Math.floor(domino.dot / 10);
+            //below separator
+            if (x >= 2 && y >= 1 && y < num_cols - 1 && (this.state.board[x - 2][y].direction === Left || this.state.board[x - 2][y].direction === Right) && this.state.board[x - 2][y].dot === Separator && this.state.board[x - 2][y - 1].dot === this.state.board[x - 2][y + 1].dot && (this.state.board[x - 2][y + 1].dot === 0 || dots1 === 0 || this.state.board[x - 2][y + 1].dot === dots1)) {
+                return true;
             }
-            if (neighborDown.direction === Up && dot !== 0 && Math.floor(neighborDown.dot / 10) !== 0 && Math.floor(neighborDown.dot / 10) !== dot) {
-                return false;
+            //above normal
+            if (x < num_rows - 2 && x > 0 && (this.state.board[x + 2][y].direction === Up || this.state.board[x + 2][y].direction === Down) && (this.state.board[x + 2][y].dot === dots2 || dots2 === 0 || this.state.board[x + 2][y].dot === 0)) {
+                return true;
             }
-            if (neighborDown.direction === Down && dot !== 0 && neighborDown.dot % 10 !== 0 && neighborDown.dot % 10 !== dot) {
-                return false;
-            }
-        }
-        if (neighborLeft) {
-            //TODO - unsupported for now
-            if (((domino.direction === Left || domino.direction === Right) &&
-                (neighborLeft.direction === Up || neighborLeft.direction === Down)) ||
-                ((domino.direction === Up || domino.direction === Down))) {
-                return false;
-            }
-            let dot;
-            if (domino.direction === Left) {
-                dot = Math.floor(domino.dot / 10);
-            } else if (domino.direction === Right) {
-                dot = domino.dot % 10;
-            }
-            if (neighborLeft.direction === Left && dot !== 0 && neighborLeft.dot % 10 !== 0 && neighborLeft.dot % 10 !== dot) {
-                return false;
-            }
-            if (neighborLeft.direction === Right && dot !== 0 && Math.floor(neighborLeft.dot / 10) !== 0 && Math.floor(neighborLeft.dot / 10) !== dot) {
-                return false;
+            //above separator
+            if (x < num_rows - 2 && y >= 1 && y < num_cols - 1 && (this.state.board[x + 2][y].direction === Left || this.state.board[x + 2][y].direction === Right) && this.state.board[x + 2][y].dot === Separator && this.state.board[x + 2][y - 1].dot === this.state.board[x + 2][y + 1].dot && (this.state.board[x + 2][y + 1].dot === 0 || dots2 === 0 || this.state.board[x + 2][y + 1].dot === dots2)) {
+                return true;
             }
         }
-        if (neighborRight) {
-            //TODO - unsupported for now
-            if (((domino.direction === Left || domino.direction === Right) &&
-                (neighborRight.direction === Up || neighborRight.direction === Down)) ||
-                ((domino.direction === Up || domino.direction === Down))) {
-                return false;
-            }
-            let dot;
-            if (domino.direction === Left) {
-                dot = domino.dot % 10;
-            } else if (domino.direction === Right) {
-                dot = Math.floor(domino.dot / 10);
-            }
-            if (neighborRight.direction === Left && dot !== 0 && Math.floor(neighborRight.dot / 10) !== 0 && Math.floor(neighborRight.dot / 10) !== dot) {
-                return false;
-            }
-            if (neighborRight.direction === Right && dot !== 0 && neighborRight.dot % 10 !== 0 && neighborRight.dot % 10 !== dot) {
-                return false;
-            }
-        }
-        return true;
+        return false;
     }
 
     static getDominoByPlacement(placement) {
@@ -187,15 +169,38 @@ class Game extends Component {
     onDrop(ev) {
         ev.preventDefault();
         if (ev.target.id) {
-            const placement = { 'x': parseInt(ev.target.id.split(',')[1]), 'y': parseInt(ev.target.id.split(',')[0]) };
-        //TODO - check this if line
-        // if (Object.keys(this.state.bank).length > 0) {
+            const placement = { 'x': parseInt(ev.target.id.split(',')[0]), 'y': parseInt(ev.target.id.split(',')[1]) };
             const idDropped = parseInt(ev.dataTransfer.getData('id'));
             if (!this.isValidPlacement(AllDominoes[idDropped], placement)) {
                 return;
             }
+            const domino = AllDominoes[idDropped];
             AllDominoes[idDropped].placement = placement;
-            let boardCopy = this.state.board.concat(idDropped);
+            let boardCopy = this.state.board;
+            let dots1;
+            let dots2;
+            if (domino.direction === Left || domino.direction === Up) {
+                dots1 = Math.floor(domino.dot / 10);
+                dots2 = Math.floor(domino.dot % 10);
+            } else {
+                dots1 = Math.floor(domino.dot % 10);
+                dots2 = Math.floor(domino.dot / 10);
+            }
+            if (domino.direction === Left || domino.direction === Right) {
+                boardCopy[placement.x][placement.y - 1].dot = dots1;
+                boardCopy[placement.x][placement.y - 1].direction = domino.direction;
+                boardCopy[placement.x][placement.y].dot = Separator;
+                boardCopy[placement.x][placement.y].direction = domino.direction;
+                boardCopy[placement.x][placement.y + 1].dot = dots2;
+                boardCopy[placement.x][placement.y + 1].direction = domino.direction;
+            } else {
+                boardCopy[placement.x - 1][placement.y].dot = dots1;
+                boardCopy[placement.x - 1][placement.y].direction = domino.direction;;
+                boardCopy[placement.x][placement.y].dot = Separator;
+                boardCopy[placement.x][placement.y].direction = domino.direction;;
+                boardCopy[placement.x + 1][placement.y].dot = dots2;
+                boardCopy[placement.x + 1][placement.y].direction = domino.direction;;
+            }
             //TODO - solve resizing bug
             // this.getRowsColsNumber(boardCopy);
             this.setState({

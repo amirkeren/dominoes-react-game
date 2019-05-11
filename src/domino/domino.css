@@ -10,6 +10,18 @@
 
 .half_domino {
   background-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+.cell {
+  background-color: white;
+}
+
+.separator {
+  background-color: white;
+  border-left: thick solid black;
+  margin: 0 auto;
 }
 
 .dotted {
