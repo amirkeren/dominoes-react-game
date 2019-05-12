@@ -183,7 +183,7 @@ class Game extends Component {
             for (let i = 0; i < this.state.board.length; i++) {
                 boardDeepCopy[i] = new Array(this.state.board[i].length);
                 for (let j = 0; j < this.state.board[i].length; j++) {
-                    boardDeepCopy[i][j] = { dot: this.state.board[i][j].dot };
+                    boardDeepCopy[i][j] = { dot: this.state.board[i][j].dot, direction: this.state.board[i][j].direction };
                 }
             }
             stateCopy.board = boardDeepCopy;
@@ -329,6 +329,10 @@ class Game extends Component {
         this.setState(plays[--playsIndex]);
     }
 
+    onUndo() {
+        this.setState(plays.pop());
+    }
+
     render() {
         const endResult = this.getEndResult();
         const temp_mins = Math.floor(this.state.elapsed_time / 60);
@@ -336,6 +340,12 @@ class Game extends Component {
         const mins = temp_mins < 10 ? '0' + temp_mins : temp_mins;
         const secs = temp_secs < 10 ? '0' + temp_secs : temp_secs;
         const avg = this.state.plays_count > 0 ? Math.floor(this.state.elapsed_time / this.state.plays_count) : 0;
+        let undoDisabled;
+        if (gameOver) {
+            undoDisabled = true;
+        } else {
+            undoDisabled = plays.length === 0;
+        }
         return (
             <div>
                 <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
@@ -351,6 +361,9 @@ class Game extends Component {
                     </button>
                     <button disabled={!gameOver} onClick={() => Game.onReset()}>
                         Reset
+                    </button>
+                    <button disabled={gameOver || (!gameOver && plays.length === 0)} onClick={() => this.onUndo()}>
+                        Undo
                     </button>
                     <button disabled={(gameOver && playsIndex === undefined || playsIndex === plays.length - 1) || !gameOver} onClick={() => this.nextStep()}>
                         Next
