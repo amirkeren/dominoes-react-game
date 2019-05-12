@@ -139,6 +139,14 @@ class Game extends Component {
             if (y < num_cols - 2 && x >= 1 && x < num_rows - 1 && (this.state.board[x][y + 2].direction === Up || this.state.board[x][y + 2].direction === Down) && this.state.board[x][y + 2].dot === Separator && this.state.board[x - 1][y + 2].dot === this.state.board[x + 1][y + 2].dot && (this.state.board[x + 1][y + 2].dot === 0 || dots2 === 0 || this.state.board[x + 1][y + 2].dot === dots2)) {
                 return true;
             }
+            //above separator
+            if (x >= 1 && (this.state.board[x - 1][y].direction === Up || this.state.board[x - 1][y].direction === Down) && dots1 === dots2 && (this.state.board[x - 1][y].dot === dots1 || this.state.board[x - 1][y].dot === 0 || dots1 === 0)) {
+                return true;
+            }
+            //below separator
+            if (x < num_rows - 1 && (this.state.board[x + 1][y].direction === Up || this.state.board[x + 1][y].direction === Down) && dots1 === dots2 && (this.state.board[x + 1][y].dot === dots1 || this.state.board[x + 1][y].dot === 0 || dots1 === 0)) {
+                return true;
+            }
         } else {
             //if already occupied
             if (this.state.board[x][y].dot !== Empty || this.state.board[Math.max(0, x - 1)][y].dot !== Empty || this.state.board[Math.min(num_rows - 1, x + 1)][y].dot !== Empty) {
@@ -163,6 +171,14 @@ class Game extends Component {
             }
             //above separator
             if (x < num_rows - 2 && y >= 1 && y < num_cols - 1 && (this.state.board[x + 2][y].direction === Left || this.state.board[x + 2][y].direction === Right) && this.state.board[x + 2][y].dot === Separator && this.state.board[x + 2][y - 1].dot === this.state.board[x + 2][y + 1].dot && (this.state.board[x + 2][y + 1].dot === 0 || dots2 === 0 || this.state.board[x + 2][y + 1].dot === dots2)) {
+                return true;
+            }
+            //to the left separator
+            if (y >= 1 && (this.state.board[x][y - 1].direction === Left || this.state.board[x][y - 1].direction === Right) && dots1 === dots2 && (this.state.board[x][y - 1].dot === dots1 || this.state.board[x][y - 1].dot === 0 || dots1 === 0)) {
+                return true;
+            }
+            //to the right separator
+            if (y < num_cols - 1 && (this.state.board[x][y + 1].direction === Left || this.state.board[x][y + 1].direction === Right) && dots1 === dots2 && (this.state.board[x][y + 1].dot === dots1 || this.state.board[x][y + 1].dot === 0 || dots1 === 0)) {
                 return true;
             }
         }
@@ -340,12 +356,6 @@ class Game extends Component {
         const mins = temp_mins < 10 ? '0' + temp_mins : temp_mins;
         const secs = temp_secs < 10 ? '0' + temp_secs : temp_secs;
         const avg = this.state.plays_count > 0 ? Math.floor(this.state.elapsed_time / this.state.plays_count) : 0;
-        let undoDisabled;
-        if (gameOver) {
-            undoDisabled = true;
-        } else {
-            undoDisabled = plays.length === 0;
-        }
         return (
             <div>
                 <h1>Dominoes <img src={ImageHeadline} /> Game!</h1>
